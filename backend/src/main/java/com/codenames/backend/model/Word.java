@@ -10,6 +10,10 @@ public class Word {
     private Boolean isClicked;
     private WordColor wordColor;
 
+    public Word() {
+
+    }
+
     public Word(
             String name,
             Boolean isSelected,

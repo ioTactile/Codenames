@@ -10,7 +10,9 @@ import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.codenames.backend.model.Clue;
 import com.codenames.backend.model.Player;
+import com.codenames.backend.model.PlayerRole;
 import com.codenames.backend.model.PlayerTeam;
 import com.codenames.backend.model.Session;
 import com.codenames.backend.model.SessionStatus;
@@ -29,7 +31,7 @@ public class SessionService {
         Session session = new Session();
 
         session.setPlayers(new ArrayList<>());
-        session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE));
+        session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
 
         List<Word> words = new ArrayList<>();
 
@@ -40,6 +42,7 @@ public class SessionService {
         }
 
         session.setWords(words);
+        session.setClues(new ArrayList<>());
 
         int redCount = (int) words.stream().filter(word -> word.getWordColor() == WordColor.RED).count();
         int blueCount = (int) words.stream().filter(word -> word.getWordColor() == WordColor.BLUE).count();
@@ -62,25 +65,6 @@ public class SessionService {
         return session;
     }
 
-    public Session joinSession(Integer sessionId, String pseudo) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
-        if (session != null) {
-            session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE));
-            session.setUpdatedAt(LocalDate.now());
-            sessionRepository.save(session);
-        }
-        return session;
-    }
-
-    public void startSession(Integer sessionId) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
-        if (session != null) {
-            session.setStatus(SessionStatus.IN_PROGRESS);
-            session.setUpdatedAt(LocalDate.now());
-            sessionRepository.save(session);
-        }
-    }
-
     public Session getSessionById(Integer sessionId) {
         return sessionRepository.findById(sessionId).orElse(null);
     }
@@ -89,16 +73,82 @@ public class SessionService {
         sessionRepository.deleteById(sessionId);
     }
 
-    public void selectTeam(Integer sessionId, String pseudo, String team) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
+    public void joinSession(Integer sessionId, String pseudo) {
+        Session session = getSessionById(sessionId);
         if (session != null) {
-            session.getPlayers().add(new Player(pseudo, PlayerTeam.valueOf(team)));
+            if (!session.getStatus().equals(SessionStatus.PENDING)) {
+                return;
+            }
+            session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
+            session.setUpdatedAt(LocalDate.now());
+            sessionRepository.save(session);
+        }
+    }
+
+    public void joinSessionAsSpectator(Integer sessionId) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            if (!session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
+                return;
+            }
+            String pseudo = "Spectateur " + (int) session.getPlayers().stream()
+                    .filter(player -> player.getPlayerRole().equals(PlayerRole.SPECTATOR)).count();
+                    
+            session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.SPECTATOR));
+            session.setUpdatedAt(LocalDate.now());
+            sessionRepository.save(session);
+        }
+    }
+
+    public void leaveSession(Integer sessionId, String pseudo) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            if (!session.getStatus().equals(SessionStatus.PENDING)) {
+                return;
+            }
+            session.getPlayers().removeIf(player -> player.getName().equals(pseudo));
+            session.setUpdatedAt(LocalDate.now());
+            sessionRepository.save(session);
+        }
+    }
+
+    public void startSession(Integer sessionId) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            if (session.getPlayers().size() < 4) {
+                return;
+            }
+            session.setStatus(SessionStatus.IN_PROGRESS);
+            session.setUpdatedAt(LocalDate.now());
+            sessionRepository.save(session);
+        }
+    }
+
+    public void selectTeam(Integer sessionId, Player player, String team) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            player.setPlayerTeam(PlayerTeam.valueOf(team));
+            sessionRepository.save(session);
+        }
+    }
+
+    public void selectRole(Integer sessionId, Player player, String role) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            if (role.equals(PlayerRole.SPYMASTER.toString())) {
+                for (Player p : session.getPlayers()) {
+                    if (p.getPlayerTeam().equals(player.getPlayerTeam()) && p.getPlayerRole().equals(PlayerRole.SPYMASTER)) {
+                        p.setPlayerRole(PlayerRole.OPERATIVE);
+                    }
+                }
+            }
+            player.setPlayerRole(PlayerRole.valueOf(role));
             sessionRepository.save(session);
         }
     }
 
     public void shufflePlayers(Integer sessionId) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
+        Session session = getSessionById(sessionId);
         if (session != null) {
             List<Player> players = session.getPlayers();
             Collections.shuffle(players);
@@ -131,7 +181,7 @@ public class SessionService {
     }
 
     public void switchTeamTurn(Integer sessionId) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
+        Session session = getSessionById(sessionId);
         if (session != null) {
             if (session.getTeamTurn().equals(PlayerTeam.RED.toString())) {
                 session.setTeamTurn(PlayerTeam.BLUE.toString());
@@ -143,7 +193,7 @@ public class SessionService {
     }
 
     public void selectWord(Integer sessionId, Word word, Player player) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
+        Session session = getSessionById(sessionId);
         if (session != null) {
             if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
                 word.setIsSelected(true);
@@ -154,9 +204,13 @@ public class SessionService {
     }
 
     public void clickWord(Integer sessionId, Word word, Player player) {
-        Session session = sessionRepository.findById(sessionId).orElse(null);
+        Session session = getSessionById(sessionId);
         if (session != null) {
             if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
+                if (session.getClues().size() == 0) {
+                    return;
+                }
+                
                 word.setIsClicked(true);
 
                 if (word.getWordColor() == WordColor.RED) {
@@ -185,12 +239,39 @@ public class SessionService {
                     }
                 }
 
+                if (session.getClues().size() > 0) {
+                    Clue clue = session.getClues().get(session.getClues().size() - 1);
+                    clue.setRemaining(clue.getRemaining() - 1);
+                    if (clue.getRemaining() == 0) {
+                        switchTeamTurn(sessionId);
+                    }
+                }
+
                 sessionRepository.save(session);
             }
         }
     }
 
-    public List<Word> getWords() throws IOException {
+    public void addClue(Integer sessionId, Player player, String name, int attempts) {
+        Session session = getSessionById(sessionId);
+        if (session != null) {
+            if (!player.getPlayerRole().equals(PlayerRole.SPYMASTER)) {
+                return;
+            }
+            if (!player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
+                return;
+            }
+            if (session.getWords().stream().anyMatch(word -> word.getName().equals(name))) {
+                throw new IllegalArgumentException("The clue cannot be the same as a word on the board");
+            }
+
+            int remaining = attempts + 1;
+            session.getClues().add(new Clue(name, attempts, remaining, player.getPlayerTeam().toString()));
+            sessionRepository.save(session);
+        }
+    }
+
+    private List<Word> getWords() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
         List<Word> words = mapper.readValue(
                 getClass().getResourceAsStream("/words.json"),

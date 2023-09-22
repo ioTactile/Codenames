@@ -1,13 +1,19 @@
 package com.codenames.backend.model;
 
 public class Player {
-    
+
     private String name;
     private PlayerTeam playerTeam;
+    private PlayerRole playerRole;
 
-    public Player(String name, PlayerTeam playerTeam) {
+    public Player() {
+
+    }
+
+    public Player(String name, PlayerTeam playerTeam, PlayerRole playerRole) {
         this.name = name;
         this.playerTeam = playerTeam;
+        this.playerRole = playerRole;
     }
 
     public String getName() {
@@ -22,5 +28,12 @@ public class Player {
     }
     public void setPlayerTeam(PlayerTeam playerTeam) {
         this.playerTeam = playerTeam;
+    }
+
+    public PlayerRole getPlayerRole() {
+        return playerRole;
+    }
+    public void setPlayerRole(PlayerRole playerRole) {
+        this.playerRole = playerRole;
     }
 }
