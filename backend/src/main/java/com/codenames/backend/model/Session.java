@@ -1,9 +1,12 @@
 package com.codenames.backend.model;
 
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
@@ -62,6 +65,8 @@ public class Session {
         this.sessionId = sessionId;
     }
 
+    @ElementCollection
+    @CollectionTable(name = "players", joinColumns = @JoinColumn(name = "session_id"))
     @Column(name = "players", nullable = false)
     public List<Player> getPlayers() {
         return players;
@@ -70,6 +75,8 @@ public class Session {
         this.players = players;
     }
 
+    @ElementCollection
+    @CollectionTable(name = "words", joinColumns = @JoinColumn(name = "session_id"))
     @Column(name = "words", nullable = false)
     public List<Word> getWords() {
         return words;
@@ -78,6 +85,8 @@ public class Session {
         this.words = words;
     }
 
+    @ElementCollection
+    @CollectionTable(name = "clues", joinColumns = @JoinColumn(name = "session_id"))
     @Column(name = "clues", nullable = false)
     public List<Clue> getClues() {
         return clues;

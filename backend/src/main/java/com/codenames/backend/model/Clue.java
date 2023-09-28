@@ -1,5 +1,8 @@
 package com.codenames.backend.model;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class Clue {
     
     private String name;

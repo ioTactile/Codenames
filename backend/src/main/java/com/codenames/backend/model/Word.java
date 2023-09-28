@@ -2,6 +2,9 @@ package com.codenames.backend.model;
 
 import java.util.List;
 
+import jakarta.persistence.Embeddable;
+
+@Embeddable
 public class Word {
 
     private String name;
