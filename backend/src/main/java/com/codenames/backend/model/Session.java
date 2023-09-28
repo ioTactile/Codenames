@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "sessions")
 public class Session {
 
-    private Integer sessionId;
+    private Long sessionId;
     private List<Player> players;
     private List<Word> words;
     private List<Clue> clues;
@@ -29,7 +29,7 @@ public class Session {
     }
 
     public Session(
-            Integer sessionId,
+            Long sessionId,
             List<Player> players,
             List<Word> words,
             List<Clue> clues,
@@ -54,11 +54,11 @@ public class Session {
     }
 
     @Id
-    @GeneratedValue
-    public Integer getSessionId() {
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
+    public Long getSessionId() {
         return sessionId;
     }
-    public void setSessionId(Integer sessionId) {
+    public void setSessionId(Long sessionId) {
         this.sessionId = sessionId;
     }
 

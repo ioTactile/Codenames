@@ -6,6 +6,6 @@ import org.springframework.stereotype.Repository;
 import com.codenames.backend.model.Session;
 
 @Repository
-public interface SessionRepository extends JpaRepository<Session, Integer> {
+public interface SessionRepository extends JpaRepository<Session, Long> {
 
 }
