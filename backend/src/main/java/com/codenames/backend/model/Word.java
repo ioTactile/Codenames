@@ -7,10 +7,9 @@ import jakarta.persistence.Embeddable;
 @Embeddable
 public class Word {
 
-    private String name;
-    private Boolean isSelected;
-    private List<Player> selectedBy;
-    private Boolean isClicked;
+    private String wordName;
+    private List<String> selectedBy;
+    private WordState wordState;
     private WordColor wordColor;
 
     public Word() {
@@ -18,49 +17,44 @@ public class Word {
     }
 
     public Word(
-            String name,
-            Boolean isSelected,
-            List<Player> selectedBy,
-            Boolean isCliked,
+            String wordName,
+            List<String> selectedBy,
+            WordState wordState,
             WordColor wordColor) {
-        this.name = name;
-        this.isSelected = isSelected;
+        this.wordName = wordName;
         this.selectedBy = selectedBy;
-        this.isClicked = isCliked;
+        this.wordState = wordState;
         this.wordColor = wordColor;
     }
 
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public Boolean getIsSelected() {
-        return isSelected;
-    }
-    public void setIsSelected(Boolean isSelected) {
-        this.isSelected = isSelected;
+    public String getWordName() {
+        return wordName;
     }
 
-    public List<Player> getSelectedBy() {
+    public void setWordName(String wordName) {
+        this.wordName = wordName;
+    }
+
+    public List<String> getSelectedBy() {
         return selectedBy;
     }
-    public void setSelectedBy(List<Player> seletedby) {
-        this.selectedBy = seletedby;
+
+    public void setSelectedBy(List<String> selectedBy) {
+        this.selectedBy = selectedBy;
     }
 
-    public Boolean getIsClicked() {
-        return isClicked;
+    public WordState getWordState() {
+        return wordState;
     }
-    public void setIsClicked(Boolean isClicked) {
-        this.isClicked = isClicked;
+
+    public void setWordState(WordState wordState) {
+        this.wordState = wordState;
     }
 
     public WordColor getWordColor() {
         return wordColor;
     }
+
     public void setWordColor(WordColor wordColor) {
         this.wordColor = wordColor;
     }

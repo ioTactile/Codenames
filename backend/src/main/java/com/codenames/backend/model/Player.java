@@ -22,6 +22,7 @@ public class Player {
     public String getName() {
         return name;
     }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -29,6 +30,7 @@ public class Player {
     public PlayerTeam getPlayerTeam() {
         return playerTeam;
     }
+
     public void setPlayerTeam(PlayerTeam playerTeam) {
         this.playerTeam = playerTeam;
     }
@@ -36,6 +38,7 @@ public class Player {
     public PlayerRole getPlayerRole() {
         return playerRole;
     }
+
     public void setPlayerRole(PlayerRole playerRole) {
         this.playerRole = playerRole;
     }

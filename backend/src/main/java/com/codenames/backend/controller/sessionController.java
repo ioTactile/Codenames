@@ -23,7 +23,7 @@ import com.codenames.backend.service.SessionService;
 @RestController
 @RequestMapping("/room")
 public class sessionController {
-    
+
     private final SessionService sessionService;
     private final SimpMessagingTemplate messagingTemplate;
 
@@ -33,9 +33,10 @@ public class sessionController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Session> create(@RequestBody String pseudo) {
-        sessionService.createSession(pseudo);
-        return ResponseEntity.ok(sessionService.createSession(pseudo));
+    public ResponseEntity<Session> create(@RequestBody Map<String, String> requestPayload) {
+        String pseudo = requestPayload.get("pseudo");
+        Session session = sessionService.createSession(pseudo);
+        return ResponseEntity.ok(session);
     }
 
     @GetMapping("/{id}")
@@ -55,7 +56,8 @@ public class sessionController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<String> handleAction(@PathVariable("id") Long id, @RequestBody Map<String, Object> requestPayload) {
+    public ResponseEntity<String> handleAction(@PathVariable("id") Long id,
+            @RequestBody Map<String, Object> requestPayload) {
         String action = (String) requestPayload.get("action");
         String pseudo = (String) requestPayload.get("pseudo");
 
@@ -112,59 +114,66 @@ public class sessionController {
     }
 
     // @PutMapping("/{id}/join")
-    // public ResponseEntity<String> join(@PathVariable("id") Long id, @RequestBody String pseudo) {
-    //     sessionService.joinSession(id, pseudo);
-    //     messagingTemplate.convertAndSend("/topic/session/" + id + "/join", pseudo);
-    //     return ResponseEntity.ok("Session joined");
+    // public ResponseEntity<String> join(@PathVariable("id") Long id, @RequestBody
+    // String pseudo) {
+    // sessionService.joinSession(id, pseudo);
+    // messagingTemplate.convertAndSend("/topic/session/" + id + "/join", pseudo);
+    // return ResponseEntity.ok("Session joined");
     // }
 
     // @PutMapping("/{id}/leave")
-    // public ResponseEntity<String> leave(@PathVariable("id") Long id, @RequestBody String pseudo) {
-    //     sessionService.leaveSession(id, pseudo);
-    //     messagingTemplate.convertAndSend("/topic/session/" + id + "/leave", pseudo);
-    //     return ResponseEntity.ok("Session left");
+    // public ResponseEntity<String> leave(@PathVariable("id") Long id, @RequestBody
+    // String pseudo) {
+    // sessionService.leaveSession(id, pseudo);
+    // messagingTemplate.convertAndSend("/topic/session/" + id + "/leave", pseudo);
+    // return ResponseEntity.ok("Session left");
     // }
 
     // @PutMapping("/{id}/start")
     // public ResponseEntity<String> start(@PathVariable("id") Long id) {
-    //     sessionService.startSession(id);
-    //     messagingTemplate.convertAndSend("/topic/session/" + id + "/start", id);
-    //     return ResponseEntity.ok("Session started");
+    // sessionService.startSession(id);
+    // messagingTemplate.convertAndSend("/topic/session/" + id + "/start", id);
+    // return ResponseEntity.ok("Session started");
     // }
 
     // @PutMapping("/{id}/shuffle-players")
     // public ResponseEntity<String> shufflePlayers(@PathVariable("id") Long id) {
-    //     sessionService.shufflePlayers(id);
-    //     return ResponseEntity.ok("Players shuffled");
+    // sessionService.shufflePlayers(id);
+    // return ResponseEntity.ok("Players shuffled");
     // }
-    
+
     // @PutMapping("/{id}/select-team")
-    // public ResponseEntity<String> selectTeam(@PathVariable("id") Long id, @RequestBody Player player, @RequestBody String team) {
-    //     sessionService.selectTeam(id, player, team);
-    //     return ResponseEntity.ok("Team selected");
+    // public ResponseEntity<String> selectTeam(@PathVariable("id") Long id,
+    // @RequestBody Player player, @RequestBody String team) {
+    // sessionService.selectTeam(id, player, team);
+    // return ResponseEntity.ok("Team selected");
     // }
 
     // @PutMapping("/{id}/select-role")
-    // public ResponseEntity<String> selectRole(@PathVariable("id") Long id, @RequestBody Player player, @RequestBody String role) {
-    //     sessionService.selectRole(id, player, role);
-    //     return ResponseEntity.ok("Role selected");
+    // public ResponseEntity<String> selectRole(@PathVariable("id") Long id,
+    // @RequestBody Player player, @RequestBody String role) {
+    // sessionService.selectRole(id, player, role);
+    // return ResponseEntity.ok("Role selected");
     // }
 
     // @PutMapping("/{id}/select-word")
-    // public ResponseEntity<String> selectWord(@PathVariable("id") Long id, @RequestBody Word word, @RequestBody Player player) {
-    //     sessionService.selectWord(id, word, player);
-    //     return ResponseEntity.ok("Word selected");
+    // public ResponseEntity<String> selectWord(@PathVariable("id") Long id,
+    // @RequestBody Word word, @RequestBody Player player) {
+    // sessionService.selectWord(id, word, player);
+    // return ResponseEntity.ok("Word selected");
     // }
 
     // @PutMapping("/{id}/click-word")
-    // public ResponseEntity<String> clickWord(@PathVariable("id") Long id, @RequestBody Word word, @RequestBody Player player) {
-    //     sessionService.clickWord(id, word, player);
-    //     return ResponseEntity.ok("Word clicked");
+    // public ResponseEntity<String> clickWord(@PathVariable("id") Long id,
+    // @RequestBody Word word, @RequestBody Player player) {
+    // sessionService.clickWord(id, word, player);
+    // return ResponseEntity.ok("Word clicked");
     // }
 
     // @PutMapping("/{id}/add-clue")
-    // public ResponseEntity<String> addClue(@PathVariable("id") Long id, @RequestBody Clue clue, @RequestBody Player player) {
-    //     sessionService.addClue(id, clue, player);
-    //     return ResponseEntity.ok("Clue added");
+    // public ResponseEntity<String> addClue(@PathVariable("id") Long id,
+    // @RequestBody Clue clue, @RequestBody Player player) {
+    // sessionService.addClue(id, clue, player);
+    // return ResponseEntity.ok("Clue added");
     // }
 }

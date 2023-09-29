@@ -1,7 +1,7 @@
 package com.codenames.backend.service;
 
 import java.io.IOException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -18,7 +18,10 @@ import com.codenames.backend.model.Session;
 import com.codenames.backend.model.SessionStatus;
 import com.codenames.backend.model.Word;
 import com.codenames.backend.model.WordColor;
+import com.codenames.backend.model.WordState;
 import com.codenames.backend.repository.SessionRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
@@ -61,8 +64,8 @@ public class SessionService {
         session.setBlueRemainingWords(blueCount);
         session.setIsBlackCard(false);
         session.setStatus(SessionStatus.PENDING);
-        session.setCreatedAt(LocalDate.now());
-        session.setUpdatedAt(LocalDate.now());
+        session.setCreatedAt(LocalDateTime.now());
+        session.setUpdatedAt(LocalDateTime.now());
 
         sessionRepository.save(session);
 
@@ -94,7 +97,6 @@ public class SessionService {
             return;
         }
         session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
-        session.setUpdatedAt(LocalDate.now());
         sessionRepository.save(session);
     }
 
@@ -110,7 +112,6 @@ public class SessionService {
                 .filter(player -> player.getPlayerRole().equals(PlayerRole.SPECTATOR)).count();
 
         session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.SPECTATOR));
-        session.setUpdatedAt(LocalDate.now());
         sessionRepository.save(session);
     }
 
@@ -123,7 +124,6 @@ public class SessionService {
             return;
         }
         session.getPlayers().removeIf(player -> player.getName().equals(pseudo));
-        session.setUpdatedAt(LocalDate.now());
         sessionRepository.save(session);
     }
 
@@ -136,7 +136,7 @@ public class SessionService {
             return;
         }
         session.setStatus(SessionStatus.IN_PROGRESS);
-        session.setUpdatedAt(LocalDate.now());
+        session.setUpdatedAt(LocalDateTime.now());
         sessionRepository.save(session);
     }
 
@@ -214,8 +214,12 @@ public class SessionService {
             throw new IllegalStateException("Session with id " + sessionId + " does not exist");
         }
         if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
-            word.setIsSelected(true);
-            word.getSelectedBy().add(player);
+            if (word.getWordState().equals(WordState.SELECTED)) {
+                word.setWordState(WordState.NOT_SELECTED);
+                word.getSelectedBy().remove(player.getName());
+            }
+            word.setWordState(WordState.SELECTED);
+            word.getSelectedBy().add(player.getName());
             sessionRepository.save(session);
         }
     }
@@ -230,7 +234,7 @@ public class SessionService {
                 return;
             }
 
-            word.setIsClicked(true);
+            word.setWordState(WordState.CLICKED);
             if (word.getWordColor() == WordColor.RED) {
                 session.setRedRemainingWords(session.getRedRemainingWords() - 1);
             } else if (word.getWordColor() == WordColor.BLUE) {
@@ -242,17 +246,17 @@ public class SessionService {
             }
             if (session.getRedRemainingWords() == 0) {
                 session.setStatus(SessionStatus.RED_TEAM_WINS);
-                session.setUpdatedAt(LocalDate.now());
+                session.setUpdatedAt(LocalDateTime.now());
             } else if (session.getBlueRemainingWords() == 0) {
                 session.setStatus(SessionStatus.BLUE_TEAM_WINS);
-                session.setUpdatedAt(LocalDate.now());
+                session.setUpdatedAt(LocalDateTime.now());
             } else if (session.getIsBlackCard()) {
                 if (session.getTeamTurn().equals(PlayerTeam.RED.toString())) {
                     session.setStatus(SessionStatus.BLUE_TEAM_WINS);
-                    session.setUpdatedAt(LocalDate.now());
+                    session.setUpdatedAt(LocalDateTime.now());
                 } else {
                     session.setStatus(SessionStatus.RED_TEAM_WINS);
-                    session.setUpdatedAt(LocalDate.now());
+                    session.setUpdatedAt(LocalDateTime.now());
                 }
             }
             if (session.getClues().size() > 0) {
@@ -277,41 +281,50 @@ public class SessionService {
         if (!player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
             return;
         }
-        if (session.getWords().stream().anyMatch(word -> word.getName().equals(clue.getName()))) {
+        if (session.getWords().stream().anyMatch(word -> word.getWordName().equals(clue.getClueName()))) {
             throw new IllegalArgumentException("The clue cannot be the same as a word on the board");
         }
         int remaining = clue.getAttempts() + 1;
-        session.getClues().add(new Clue(clue.getName(), clue.getAttempts(), remaining, player.getPlayerTeam().toString()));
+        session.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), remaining, player.getName()));
 
         sessionRepository.save(session);
     }
 
     private List<Word> getWords() throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        List<Word> words = mapper.readValue(
-                getClass().getResourceAsStream("/words.json"),
-                mapper.getTypeFactory().constructCollectionType(List.class, Word.class));
-
-        List<Word> wordsToReturn = new ArrayList<Word>();
+        JsonNode rootNode = mapper.readTree(getClass().getResourceAsStream("/words.json"));
+        JsonNode frenchWordsNode = rootNode.path("French");
+        List<String> frenchWords = mapper.readValue(frenchWordsNode.toString(),
+                new TypeReference<List<String>>() {
+                });
+        
+        Collections.shuffle(frenchWords);
+        frenchWords.subList(0, 25).clear();
+        
+        List<Word> wordsToReturn = new ArrayList<>();
         Random random = new Random();
         int redWordsLength = random.nextBoolean() ? 9 : 8;
         int blueWordsLength = 17 - redWordsLength;
 
         for (int i = 0; i < redWordsLength; i++) {
-            wordsToReturn.add(new Word(words.remove(
-                    random.nextInt(words.size())).getName(), false, new ArrayList<>(), false, WordColor.RED));
+            wordsToReturn.add(new Word(frenchWords.remove(
+                    random.nextInt(frenchWords.size())), new ArrayList<>(), WordState.NOT_SELECTED,
+                    WordColor.RED));
         }
 
         for (int i = 0; i < blueWordsLength; i++) {
-            wordsToReturn.add(new Word(words.remove(
-                    random.nextInt(words.size())).getName(), false, new ArrayList<>(), false, WordColor.BLUE));
+            wordsToReturn.add(new Word(frenchWords.remove(
+                    random.nextInt(frenchWords.size())), new ArrayList<>(), WordState.NOT_SELECTED,
+                    WordColor.BLUE));
         }
 
-        wordsToReturn.add(new Word(words.remove(
-                random.nextInt(words.size())).getName(), false, new ArrayList<>(), false, WordColor.BLACK));
+        wordsToReturn.add(new Word(frenchWords.remove(
+                random.nextInt(frenchWords.size())), new ArrayList<>(), WordState.NOT_SELECTED,
+                WordColor.BLACK));
 
-        for (Word word : words) {
-            wordsToReturn.add(new Word(word.getName(), false, new ArrayList<>(), false, WordColor.WHITE));
+        for (String word : frenchWords) {
+            wordsToReturn.add(new Word(word, new ArrayList<>(), WordState.NOT_SELECTED,
+                    WordColor.WHITE));
         }
 
         Collections.shuffle(wordsToReturn);

@@ -4,33 +4,35 @@ import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class Clue {
-    
-    private String name;
+
+    private String clueName;
     private int attempts;
     private int remaining;
-    private String team;
+    private String spyName;
 
     public Clue() {
 
     }
 
-    public Clue(String name, int attempts, int remaining, String team) {
-        this.name = name;
+    public Clue(String clueName, int attempts, int remaining, String spyName) {
+        this.clueName = clueName;
         this.attempts = attempts;
         this.remaining = remaining;
-        this.team = team;
+        this.spyName = spyName;
     }
 
-    public String getName() {
-        return name;
+    public String getClueName() {
+        return clueName;
     }
-    public void setName(String name) {
-        this.name = name;
+
+    public void setClueName(String clueName) {
+        this.clueName = clueName;
     }
 
     public int getAttempts() {
         return attempts;
     }
+
     public void setAttempts(int attempts) {
         this.attempts = attempts;
     }
@@ -38,14 +40,16 @@ public class Clue {
     public int getRemaining() {
         return remaining;
     }
+
     public void setRemaining(int remaining) {
         this.remaining = remaining;
     }
 
-    public String getTeam() {
-        return team;
+    public String getSpyName() {
+        return spyName;
     }
-    public void setTeam(String team) {
-        this.team = team;
+
+    public void setSpyName(String spyName) {
+        this.spyName = spyName;
     }
 }
