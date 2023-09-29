@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.codenames.backend.model.Clue;
 import com.codenames.backend.model.Session;
 import com.codenames.backend.service.SessionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/room")
@@ -59,7 +60,6 @@ public class sessionController {
 
         String action = (String) requestPayload.get("action");
         String pseudo = (String) requestPayload.get("pseudo");
-        Clue clue = (Clue) requestPayload.get("clue");
         String wordName = (String) requestPayload.get("wordName");
         String role = (String) requestPayload.get("role");
         String team = (String) requestPayload.get("team");
@@ -89,6 +89,10 @@ public class sessionController {
                 sessionService.selectRole(id, role, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/select-role", id);
                 return ResponseEntity.ok("Role selected");
+            case "manual-team-turn":
+                sessionService.manualTeamTurn(id, pseudo);
+                messagingTemplate.convertAndSend("/topic/session/" + id + "/manual-team-turn", id);
+                return ResponseEntity.ok("Team turn changed");
             case "select-word":
                 sessionService.selectWord(id, wordName, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/select-word", id);
@@ -98,6 +102,8 @@ public class sessionController {
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/click-word", id);
                 return ResponseEntity.ok("Word clicked");
             case "add-clue":
+                ObjectMapper mapper = new ObjectMapper();
+                Clue clue = mapper.convertValue(requestPayload.get("clue"), Clue.class);
                 sessionService.addClue(id, clue, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/add-clue", id);
                 return ResponseEntity.ok("Clue added");

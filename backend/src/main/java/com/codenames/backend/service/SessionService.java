@@ -83,7 +83,7 @@ public class SessionService {
     public void deleteSessionById(Long sessionId) {
         boolean exists = sessionRepository.existsById(sessionId);
         if (!exists) {
-            return;
+            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
         }
         sessionRepository.deleteById(sessionId);
     }
@@ -91,7 +91,7 @@ public class SessionService {
     public void joinSession(Long sessionId, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not pending");
         }
         session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
         sessionRepository.save(session);
@@ -100,7 +100,7 @@ public class SessionService {
     public void joinSessionAsSpectator(Long sessionId) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not in progress");
         }
         String pseudo = "Spectateur " + (int) session.getPlayers().stream()
                 .filter(player -> player.getPlayerRole().equals(PlayerRole.SPECTATOR)).count();
@@ -111,7 +111,7 @@ public class SessionService {
     public void leaveSession(Long sessionId, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not pending");
         }
         session.getPlayers().removeIf(player -> player.getName().equals(pseudo));
         sessionRepository.save(session);
@@ -120,10 +120,10 @@ public class SessionService {
     public void startSession(Long sessionId) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not pending");
         }
         if (session.getPlayers().size() < 4) {
-            return;
+            throw new IllegalArgumentException("Not enough players");
         }
         session.setStatus(SessionStatus.IN_PROGRESS);
         session.setUpdatedAt(LocalDateTime.now());
@@ -133,12 +133,12 @@ public class SessionService {
     public void selectTeam(Long sessionId, String team, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not pending");
         }
         Player player = session.getPlayers().stream()
                 .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
         if (player == null) {
-            return;
+            throw new IllegalArgumentException("Player not found");
         }
         player.setPlayerTeam(mapStringToPlayerTeam(team));
         sessionRepository.save(session);
@@ -147,12 +147,12 @@ public class SessionService {
     public void selectRole(Long sessionId, String role, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not pending");
         }
         Player player = session.getPlayers().stream()
                 .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
         if (player == null) {
-            throw new IllegalStateException("Player with name " + pseudo + " does not exist");
+            throw new IllegalArgumentException("Player not found");
         }
         if (role.equals(PlayerRole.SPYMASTER.toString())) {
             for (Player p : session.getPlayers()) {
@@ -168,8 +168,8 @@ public class SessionService {
 
     public void shufflePlayers(Long sessionId) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
+            throw new IllegalArgumentException("Session not found or not pending");
         }
         List<Player> players = session.getPlayers();
         Collections.shuffle(players);
@@ -199,7 +199,7 @@ public class SessionService {
     public void switchTeamTurn(Long sessionId) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not in progress");
         }
         if (session.getTeamTurn().equals(PlayerTeam.RED.toString())) {
             session.setTeamTurn(PlayerTeam.BLUE.toString());
@@ -209,20 +209,36 @@ public class SessionService {
         sessionRepository.save(session);
     }
 
-    public void selectWord(Long sessionId, String wordName, String pseudo) {
+    public void manualTeamTurn(Long sessionId, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not in progress");
         }
         Player player = session.getPlayers().stream()
                 .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
-        if (player == null) {
-            return;
+        if (player == null ||
+                !player.getPlayerRole().equals(PlayerRole.OPERATIVE) ||
+                !player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
+            throw new IllegalArgumentException("Player not found, not operative or not on the right team");
+        }
+        switchTeamTurn(sessionId);
+        sessionRepository.save(session);
+    }
+
+    public void selectWord(Long sessionId, String wordName, String pseudo) {
+        Session session = getSessionById(sessionId);
+        if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
+            throw new IllegalArgumentException("Session not found or not in progress");
+        }
+        Player player = session.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null || !player.getPlayerRole().equals(PlayerRole.OPERATIVE)) {
+            throw new IllegalArgumentException("Player not found or not operative");
         }
         Word word = session.getWords().stream()
                 .filter(w -> w.getWordName().equals(wordName)).findFirst().orElse(null);
         if (word == null) {
-            return;
+            throw new IllegalArgumentException("Word not found");
         }
         if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
             if (word.getWordState().equals(WordState.SELECTED)) {
@@ -232,23 +248,25 @@ public class SessionService {
             word.setWordState(WordState.SELECTED);
             word.getSelectedBy().add(player.getName());
             sessionRepository.save(session);
+        } else {
+            throw new IllegalArgumentException("Player is not on the right team");
         }
     }
 
     public void clickWord(Long sessionId, String wordName, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not in progress");
         }
         Player player = session.getPlayers().stream()
                 .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
-        if (player == null) {
-            return;
+        if (player == null || !player.getPlayerRole().equals(PlayerRole.OPERATIVE)) {
+            throw new IllegalArgumentException("Player not found or not operative");
         }
         Word word = session.getWords().stream()
                 .filter(w -> w.getWordName().equals(wordName)).findFirst().orElse(null);
         if (word == null) {
-            return;
+            throw new IllegalArgumentException("Word not found");
         }
         if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
             if (session.getClues().size() == 0) {
@@ -287,27 +305,28 @@ public class SessionService {
                 }
             }
             sessionRepository.save(session);
+        } else {
+            throw new IllegalArgumentException("Player is not on the right team");
         }
     }
 
     public void addClue(Long sessionId, Clue clue, String pseudo) {
         Session session = getSessionById(sessionId);
         if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
-            return;
+            throw new IllegalArgumentException("Session not found or not in progress");
         }
         Player player = session.getPlayers().stream()
                 .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
-        if (player == null) {
-            return;
+        if (player == null || !player.getPlayerRole().equals(PlayerRole.SPYMASTER)) {
+            throw new IllegalArgumentException("Player not found or not spymaster");
         }
-        if (!player.getPlayerRole().equals(PlayerRole.SPYMASTER) || !player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
-            return;
+        if (!player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
+            throw new IllegalArgumentException("Player is not spymaster or not on the right team");
         }
         if (session.getWords().stream().anyMatch(word -> word.getWordName().equals(clue.getClueName()))) {
-            return;
+            throw new IllegalArgumentException("Clue name is a word from the board");
         }
-        int remaining = clue.getAttempts() + 1;
-        session.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), remaining, player.getName()));
+        session.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), clue.getAttempts(), player.getName()));
         sessionRepository.save(session);
     }
 
