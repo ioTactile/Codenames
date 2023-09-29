@@ -343,7 +343,7 @@ public class SessionService {
         List<Word> wordsToReturn = new ArrayList<>();
         Random random = new Random();
         int redWordsLength = random.nextBoolean() ? 9 : 8;
-        int blueWordsLength = 17 - redWordsLength;
+        int blueWordsLength = redWordsLength == 9 ? 8 : 9;
         int blackWordsLength = 1;
         int whiteWordsLength = 7;
 
