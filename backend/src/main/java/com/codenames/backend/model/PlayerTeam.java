@@ -1,5 +1,5 @@
 package com.codenames.backend.model;
 
 public enum PlayerTeam {
-    RED, BLUE, NONE
+   NONE, RED, BLUE
 }

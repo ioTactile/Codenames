@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.codenames.backend.model.Clue;
-import com.codenames.backend.model.Player;
 import com.codenames.backend.model.Session;
-import com.codenames.backend.model.Word;
 import com.codenames.backend.service.SessionService;
 
 @RestController
@@ -58,8 +56,13 @@ public class sessionController {
     @PutMapping("/{id}")
     public ResponseEntity<String> handleAction(@PathVariable("id") Long id,
             @RequestBody Map<String, Object> requestPayload) {
+
         String action = (String) requestPayload.get("action");
         String pseudo = (String) requestPayload.get("pseudo");
+        Clue clue = (Clue) requestPayload.get("clue");
+        String wordName = (String) requestPayload.get("wordName");
+        String role = (String) requestPayload.get("role");
+        String team = (String) requestPayload.get("team");
 
         switch (action) {
             case "join":
@@ -79,33 +82,23 @@ public class sessionController {
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/shuffle-players", id);
                 return ResponseEntity.ok("Players shuffled");
             case "select-team":
-                Player player = (Player) requestPayload.get("player");
-                String team = (String) requestPayload.get("team");
-                sessionService.selectTeam(id, player, team);
+                sessionService.selectTeam(id, team, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/select-team", id);
                 return ResponseEntity.ok("Team selected");
             case "select-role":
-                player = (Player) requestPayload.get("player");
-                String role = (String) requestPayload.get("role");
-                sessionService.selectRole(id, player, role);
+                sessionService.selectRole(id, role, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/select-role", id);
                 return ResponseEntity.ok("Role selected");
             case "select-word":
-                Word word = (Word) requestPayload.get("word");
-                player = (Player) requestPayload.get("player");
-                sessionService.selectWord(id, word, player);
+                sessionService.selectWord(id, wordName, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/select-word", id);
                 return ResponseEntity.ok("Word selected");
             case "click-word":
-                word = (Word) requestPayload.get("word");
-                player = (Player) requestPayload.get("player");
-                sessionService.clickWord(id, word, player);
+                sessionService.clickWord(id, wordName, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/click-word", id);
                 return ResponseEntity.ok("Word clicked");
             case "add-clue":
-                Clue clue = (Clue) requestPayload.get("clue");
-                player = (Player) requestPayload.get("player");
-                sessionService.addClue(id, clue, player);
+                sessionService.addClue(id, clue, pseudo);
                 messagingTemplate.convertAndSend("/topic/session/" + id + "/add-clue", id);
                 return ResponseEntity.ok("Clue added");
             default:

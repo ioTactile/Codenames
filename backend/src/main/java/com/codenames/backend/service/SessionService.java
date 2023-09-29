@@ -83,17 +83,14 @@ public class SessionService {
     public void deleteSessionById(Long sessionId) {
         boolean exists = sessionRepository.existsById(sessionId);
         if (!exists) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+            return;
         }
         sessionRepository.deleteById(sessionId);
     }
 
     public void joinSession(Long sessionId, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
-        }
-        if (!session.getStatus().equals(SessionStatus.PENDING)) {
+        if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
             return;
         }
         session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
@@ -102,25 +99,18 @@ public class SessionService {
 
     public void joinSessionAsSpectator(Long sessionId) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
-        }
-        if (!session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
+        if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
             return;
         }
         String pseudo = "Spectateur " + (int) session.getPlayers().stream()
                 .filter(player -> player.getPlayerRole().equals(PlayerRole.SPECTATOR)).count();
-
         session.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.SPECTATOR));
         sessionRepository.save(session);
     }
 
     public void leaveSession(Long sessionId, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
-        }
-        if (!session.getStatus().equals(SessionStatus.PENDING)) {
+        if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
             return;
         }
         session.getPlayers().removeIf(player -> player.getName().equals(pseudo));
@@ -129,8 +119,8 @@ public class SessionService {
 
     public void startSession(Long sessionId) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
+            return;
         }
         if (session.getPlayers().size() < 4) {
             return;
@@ -140,19 +130,29 @@ public class SessionService {
         sessionRepository.save(session);
     }
 
-    public void selectTeam(Long sessionId, Player player, String team) {
+    public void selectTeam(Long sessionId, String team, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
+            return;
         }
-        player.setPlayerTeam(PlayerTeam.valueOf(team));
+        Player player = session.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            return;
+        }
+        player.setPlayerTeam(mapStringToPlayerTeam(team));
         sessionRepository.save(session);
     }
 
-    public void selectRole(Long sessionId, Player player, String role) {
+    public void selectRole(Long sessionId, String role, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.PENDING)) {
+            return;
+        }
+        Player player = session.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            throw new IllegalStateException("Player with name " + pseudo + " does not exist");
         }
         if (role.equals(PlayerRole.SPYMASTER.toString())) {
             for (Player p : session.getPlayers()) {
@@ -162,7 +162,7 @@ public class SessionService {
                 }
             }
         }
-        player.setPlayerRole(PlayerRole.valueOf(role));
+        player.setPlayerRole(mapStringToPlayerRole(role));
         sessionRepository.save(session);
     }
 
@@ -184,21 +184,22 @@ public class SessionService {
         }
         for (Player player : redPlayers) {
             player.setPlayerTeam(PlayerTeam.RED);
+            player.setPlayerRole(PlayerRole.NONE);
         }
         for (Player player : bluePlayers) {
             player.setPlayerTeam(PlayerTeam.BLUE);
+            player.setPlayerRole(PlayerRole.NONE);
         }
         session.getPlayers().clear();
         session.getPlayers().addAll(bluePlayers);
         session.getPlayers().addAll(redPlayers);
-
         sessionRepository.save(session);
     }
 
     public void switchTeamTurn(Long sessionId) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
+            return;
         }
         if (session.getTeamTurn().equals(PlayerTeam.RED.toString())) {
             session.setTeamTurn(PlayerTeam.BLUE.toString());
@@ -208,10 +209,20 @@ public class SessionService {
         sessionRepository.save(session);
     }
 
-    public void selectWord(Long sessionId, Word word, Player player) {
+    public void selectWord(Long sessionId, String wordName, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
+            return;
+        }
+        Player player = session.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            return;
+        }
+        Word word = session.getWords().stream()
+                .filter(w -> w.getWordName().equals(wordName)).findFirst().orElse(null);
+        if (word == null) {
+            return;
         }
         if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
             if (word.getWordState().equals(WordState.SELECTED)) {
@@ -224,16 +235,25 @@ public class SessionService {
         }
     }
 
-    public void clickWord(Long sessionId, Word word, Player player) {
+    public void clickWord(Long sessionId, String wordName, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
+        if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
+            return;
+        }
+        Player player = session.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            return;
+        }
+        Word word = session.getWords().stream()
+                .filter(w -> w.getWordName().equals(wordName)).findFirst().orElse(null);
+        if (word == null) {
+            return;
         }
         if (player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
             if (session.getClues().size() == 0) {
                 return;
             }
-
             word.setWordState(WordState.CLICKED);
             if (word.getWordColor() == WordColor.RED) {
                 session.setRedRemainingWords(session.getRedRemainingWords() - 1);
@@ -270,23 +290,24 @@ public class SessionService {
         }
     }
 
-    public void addClue(Long sessionId, Clue clue, Player player) {
+    public void addClue(Long sessionId, Clue clue, String pseudo) {
         Session session = getSessionById(sessionId);
-        if (session == null) {
-            throw new IllegalStateException("Session with id " + sessionId + " does not exist");
-        }
-        if (!player.getPlayerRole().equals(PlayerRole.SPYMASTER)) {
+        if (session == null || !session.getStatus().equals(SessionStatus.IN_PROGRESS)) {
             return;
         }
-        if (!player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
+        Player player = session.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            return;
+        }
+        if (!player.getPlayerRole().equals(PlayerRole.SPYMASTER) || !player.getPlayerTeam().toString().equals(session.getTeamTurn())) {
             return;
         }
         if (session.getWords().stream().anyMatch(word -> word.getWordName().equals(clue.getClueName()))) {
-            throw new IllegalArgumentException("The clue cannot be the same as a word on the board");
+            return;
         }
         int remaining = clue.getAttempts() + 1;
         session.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), remaining, player.getName()));
-
         sessionRepository.save(session);
     }
 
@@ -299,14 +320,13 @@ public class SessionService {
                 });
         Collections.shuffle(frenchWords);
         frenchWords = frenchWords.subList(0, 25);
-        
+
         List<Word> wordsToReturn = new ArrayList<>();
         Random random = new Random();
         int redWordsLength = random.nextBoolean() ? 9 : 8;
         int blueWordsLength = 17 - redWordsLength;
         int blackWordsLength = 1;
         int whiteWordsLength = 7;
-
 
         for (int i = 0; i < redWordsLength; i++) {
             String wordName = frenchWords.remove(random.nextInt(frenchWords.size()));
@@ -335,5 +355,27 @@ public class SessionService {
         Collections.shuffle(wordsToReturn);
 
         return wordsToReturn;
+    }
+
+    private PlayerTeam mapStringToPlayerTeam(String team) {
+        switch (team) {
+            case "RED":
+                return PlayerTeam.RED;
+            case "BLUE":
+                return PlayerTeam.BLUE;
+            default:
+                return PlayerTeam.NONE;
+        }
+    }
+
+    private PlayerRole mapStringToPlayerRole(String role) {
+        switch (role) {
+            case "SPYMASTER":
+                return PlayerRole.SPYMASTER;
+            case "OPERATIVE":
+                return PlayerRole.OPERATIVE;
+            default:
+                return PlayerRole.NONE;
+        }
     }
 }
