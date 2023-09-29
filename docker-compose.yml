@@ -5,9 +5,9 @@ services:
     container_name: local_pgdb
     restart: always
     ports:
-      - 5432:5432
+      - 5432:${POSTGRES_PORT}
     environment:
-      POSTGRES_DB: postgres
+      POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
@@ -17,7 +17,7 @@ services:
     container_name: pgadmin4_container
     restart: always
     ports:
-      - 8888:80
+      - 8888:${PGADMIN_PORT}
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
