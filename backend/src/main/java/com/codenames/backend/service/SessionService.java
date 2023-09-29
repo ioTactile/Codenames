@@ -297,33 +297,38 @@ public class SessionService {
         List<String> frenchWords = mapper.readValue(frenchWordsNode.toString(),
                 new TypeReference<List<String>>() {
                 });
-        
         Collections.shuffle(frenchWords);
-        frenchWords.subList(0, 25).clear();
+        frenchWords = frenchWords.subList(0, 25);
         
         List<Word> wordsToReturn = new ArrayList<>();
         Random random = new Random();
         int redWordsLength = random.nextBoolean() ? 9 : 8;
         int blueWordsLength = 17 - redWordsLength;
+        int blackWordsLength = 1;
+        int whiteWordsLength = 7;
+
 
         for (int i = 0; i < redWordsLength; i++) {
-            wordsToReturn.add(new Word(frenchWords.remove(
-                    random.nextInt(frenchWords.size())), new ArrayList<>(), WordState.NOT_SELECTED,
+            String wordName = frenchWords.remove(random.nextInt(frenchWords.size()));
+            wordsToReturn.add(new Word(wordName, new ArrayList<>(), WordState.NOT_SELECTED,
                     WordColor.RED));
         }
 
         for (int i = 0; i < blueWordsLength; i++) {
-            wordsToReturn.add(new Word(frenchWords.remove(
-                    random.nextInt(frenchWords.size())), new ArrayList<>(), WordState.NOT_SELECTED,
+            String wordName = frenchWords.remove(random.nextInt(frenchWords.size()));
+            wordsToReturn.add(new Word(wordName, new ArrayList<>(), WordState.NOT_SELECTED,
                     WordColor.BLUE));
         }
 
-        wordsToReturn.add(new Word(frenchWords.remove(
-                random.nextInt(frenchWords.size())), new ArrayList<>(), WordState.NOT_SELECTED,
-                WordColor.BLACK));
+        for (int i = 0; i < blackWordsLength; i++) {
+            String wordName = frenchWords.remove(random.nextInt(frenchWords.size()));
+            wordsToReturn.add(new Word(wordName, new ArrayList<>(), WordState.NOT_SELECTED,
+                    WordColor.BLACK));
+        }
 
-        for (String word : frenchWords) {
-            wordsToReturn.add(new Word(word, new ArrayList<>(), WordState.NOT_SELECTED,
+        for (int i = 0; i < whiteWordsLength; i++) {
+            String wordName = frenchWords.remove(random.nextInt(frenchWords.size()));
+            wordsToReturn.add(new Word(wordName, new ArrayList<>(), WordState.NOT_SELECTED,
                     WordColor.WHITE));
         }
 
