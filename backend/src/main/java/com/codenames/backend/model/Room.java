@@ -14,8 +14,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name = "sessions")
-public class Session {
+@Table(name = "rooms")
+public class Room {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
@@ -39,31 +39,31 @@ public class Session {
     @Column(name = "team_turn", nullable = false)
     private String teamTurn;
     @Column(name = "status", nullable = false)
-    private SessionStatus status;
+    private RoomStatus status;
     @Column(name = "red_remaining_words", nullable = false)
     private int redRemainingWords;
     @Column(name = "blue_remaining_words", nullable = false)
     private int blueRemainingWords;
     @Column(name = "is_black_card", nullable = false)
-    private Boolean isBlackCard;
+    private Boolean isBlackCardSelected;
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
-    public Session() {
+    public Room() {
     }
 
-    public Session(
+    public Room(
             Long id,
             List<Player> players,
             List<Word> words,
             List<Clue> clues,
             String teamTurn,
-            SessionStatus status,
+            RoomStatus status,
             int redRemainingWords,
             int blueRemainingWords,
-            Boolean isBlackCard,
+            Boolean isBlackCardSelected,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.id = id;
@@ -74,20 +74,20 @@ public class Session {
         this.status = status;
         this.redRemainingWords = redRemainingWords;
         this.blueRemainingWords = blueRemainingWords;
-        this.isBlackCard = isBlackCard;
+        this.isBlackCardSelected = isBlackCardSelected;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public Session(
+    public Room(
             List<Player> players,
             List<Word> words,
             List<Clue> clues,
             String teamTurn,
-            SessionStatus status,
+            RoomStatus status,
             int redRemainingWords,
             int blueRemainingWords,
-            Boolean isBlackCard,
+            Boolean isBlackCardSelected,
             LocalDateTime createdAt,
             LocalDateTime updatedAt) {
         this.players = players;
@@ -97,7 +97,7 @@ public class Session {
         this.status = status;
         this.redRemainingWords = redRemainingWords;
         this.blueRemainingWords = blueRemainingWords;
-        this.isBlackCard = isBlackCard;
+        this.isBlackCardSelected = isBlackCardSelected;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -142,11 +142,11 @@ public class Session {
         this.teamTurn = teamTurn;
     }
 
-    public SessionStatus getStatus() {
+    public RoomStatus getStatus() {
         return status;
     }
 
-    public void setStatus(SessionStatus status) {
+    public void setStatus(RoomStatus status) {
         this.status = status;
     }
 
@@ -166,12 +166,12 @@ public class Session {
         this.blueRemainingWords = blueRemainingWords;
     }
 
-    public Boolean getIsBlackCard() {
-        return isBlackCard;
+    public Boolean getIsBlackCardSelected() {
+        return isBlackCardSelected;
     }
 
-    public void setIsBlackCard(Boolean isBlackCard) {
-        this.isBlackCard = isBlackCard;
+    public void setIsBlackCardSelected(Boolean isBlackCardSelected) {
+        this.isBlackCardSelected = isBlackCardSelected;
     }
 
     public LocalDateTime getCreatedAt() {
