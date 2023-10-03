@@ -2,6 +2,8 @@
   "extends": "@tsconfig/node18/tsconfig.json",
   "include": [
     "vite.config.*",
+    "postcss.config.*",
+    "tailwind.config.*",
     "vitest.config.*",
     "cypress.config.*",
     "nightwatch.conf.*",
