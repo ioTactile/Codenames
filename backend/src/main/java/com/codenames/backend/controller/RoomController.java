@@ -60,6 +60,7 @@ public class RoomController {
 
         String action = (String) requestPayload.get("action");
         String username = (String) requestPayload.get("username");
+        String newUsername = (String) requestPayload.get("newUsername");
         String wordname = (String) requestPayload.get("wordname");
         String role = (String) requestPayload.get("role");
         String team = (String) requestPayload.get("team");
@@ -81,6 +82,10 @@ public class RoomController {
                 roomService.shufflePlayers(id);
                 messagingTemplate.convertAndSend("/topic/room/" + id + "/shuffle-players", id);
                 return ResponseEntity.ok("Players shuffled");
+            case "reset-players":
+                roomService.resetPlayers(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/reset-players", id);
+                return ResponseEntity.ok("Players reset");
             case "select-team":
                 roomService.selectTeam(id, team, username);
                 messagingTemplate.convertAndSend("/topic/room/" + id + "/select-team", id);
@@ -89,6 +94,10 @@ public class RoomController {
                 roomService.selectRole(id, role, username);
                 messagingTemplate.convertAndSend("/topic/room/" + id + "/select-role", id);
                 return ResponseEntity.ok("Role selected");
+            case "change-username":
+                roomService.changeUsername(id, username, newUsername);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/change-username", id);
+                return ResponseEntity.ok("Username changed");
             case "manual-team-turn":
                 roomService.manualTeamTurn(id, username);
                 messagingTemplate.convertAndSend("/topic/room/" + id + "/manual-team-turn", id);

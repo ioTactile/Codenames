@@ -7,6 +7,9 @@ export default {
       colors: {
         'border-yellow': '#fef9c2',
         yellow: '#fee400',
+        'yellow-300': '#fde047',
+        'yellow-400': '#facc15',
+        'yellow-500': '#eab308',
         'border-orange': '#e16000',
         orange: '#fa0',
         purple: '#881247',
@@ -15,7 +18,8 @@ export default {
         lightGray: '#CCCCCC',
         darkGray: '#727272',
         tutorial: '#FDE39C',
-        'tutorial-desktop': 'hsla(86,70%,87%,.7)'
+        'tutorial-desktop': 'hsla(86,70%,87%,.7)',
+        'green-online': '#3fda36'
       },
       screens: {
         '1201px': '1201px',

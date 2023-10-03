@@ -166,6 +166,20 @@ public class RoomService {
         roomRepository.save(room);
     }
 
+    public void changeUsername(Long roomId, String pseudo, String newPseudo) {
+        Room room = getRoomById(roomId);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
+        }
+        Player player = room.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            throw new IllegalArgumentException("Player not found");
+        }
+        player.setName(newPseudo);
+        roomRepository.save(room);
+    }
+
     public void shufflePlayers(Long roomId) {
         Room room = getRoomById(roomId);
         if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
@@ -193,6 +207,18 @@ public class RoomService {
         room.getPlayers().clear();
         room.getPlayers().addAll(bluePlayers);
         room.getPlayers().addAll(redPlayers);
+        roomRepository.save(room);
+    }
+
+    public void resetPlayers(Long rommId) {
+        Room room = getRoomById(rommId);
+        if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
+            throw new IllegalArgumentException("Room not found or not pending");
+        }
+        for (Player player : room.getPlayers()) {
+            player.setPlayerTeam(PlayerTeam.NONE);
+            player.setPlayerRole(PlayerRole.NONE);
+        }
         roomRepository.save(room);
     }
 

@@ -3,10 +3,13 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { Room } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
+import { useUsernameStore } from '@/stores/username'
 import Newsletter from '@/components/HomeNewsletter.vue'
 
 const username = ref<string>('')
 const router = useRouter()
+
+const usernameStore = useUsernameStore()
 
 const createRoom = async () => {
   if (!username.value) {
@@ -15,8 +18,8 @@ const createRoom = async () => {
   }
 
   try {
-    const data: Room = await apiFetchData('room/create', 'POST', { pseudo: username.value })
-    console.log('data', data)
+    const data: Room = await apiFetchData('room/create', 'POST', { username: username.value })
+    usernameStore.setUsername(username.value)
     router.push({ name: 'room-details', params: { id: data.id } })
   } catch (error) {
     console.error('Error:', error)

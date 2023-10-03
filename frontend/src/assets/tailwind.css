@@ -15,6 +15,57 @@ body {
   font-size: 16px;
 }
 
+.button {
+  display: inline-block;
+  position: relative;
+  padding: 0.4rem 1rem 0.3rem;
+  border-radius: 1rem;
+  color: black;
+  background-color: rgb(255, 228, 0);
+  border-width: 2px 1px;
+  border-style: solid;
+  border-color: rgb(255, 246, 167) rgb(255, 228, 0) rgb(243, 187, 0);
+  border-image: inital;
+  transition: all 200ms ease 0s;
+}
+
+.button-circle {
+  flex: 1 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0.2rem;
+  border-radius: 100%;
+  background-color: rgb(255, 228, 0);
+  border-width: 2px 1px;
+  border-style: solid;
+  border-color: rgb(255, 246, 167) rgb(255, 228, 0) rgb(243, 187, 0);
+  border-image: inital;
+}
+
+.color-beige {
+  background-color: rgb(219, 212, 175) !important;
+  border-width: 1px 1px 2px !important;
+  border-style: solid;
+  border-color: rgb(234, 230, 208) rgb(219, 212, 175) rgb(186, 180, 149) !important;
+  border-image: inital;
+}
+
+.color-red {
+  background-color: rgb(255, 136, 30) !important;
+  border-width: 1px 1px 2px !important;
+  border-style: solid;
+  border-color: rgb(255, 185, 123) rgb(255, 136, 30) rgb(217, 116, 26) !important;
+  border-image: inital;
+}
+
+.color-blue {
+  background-color: rgb(68, 200, 255) !important;
+  border-width: 1px 1px 2px !important;
+  border-style: solid;
+  border-color: rgb(145, 223, 255) rgb(68, 200, 255) rgb(63, 167, 211) !important;
+  border-image: inital;
+}
+
 @layer utilities {
   .text-shadow {
     text-shadow: 1px 1px 8px rgba(0, 0, 0, 0.6);
