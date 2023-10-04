@@ -91,7 +91,7 @@ public class RoomController {
                 messagingTemplate.convertAndSend("/topic/room/" + id + "/select-team", id);
                 return ResponseEntity.ok("Team selected");
             case "select-role":
-                roomService.selectRole(id, role, username);
+                roomService.selectRole(id, role, team, username);
                 messagingTemplate.convertAndSend("/topic/room/" + id + "/select-role", id);
                 return ResponseEntity.ok("Role selected");
             case "change-username":

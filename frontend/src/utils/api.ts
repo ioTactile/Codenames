@@ -1,8 +1,8 @@
-export async function apiFetchData<T>(
+export async function apiFetchData(
   url: string,
   method: string,
   bodyData?: Record<string, any>
-): Promise<T> {
+): Promise<any> {
   const fullUrl = `http://localhost:8080/${url}`
   const headers = new Headers({
     'Content-Type': 'application/json'
@@ -20,5 +20,11 @@ export async function apiFetchData<T>(
     throw new Error(`HTTP error! status: ${response.status}`)
   }
 
-  return response.json() as Promise<T>
+  let responseData
+  if (response.headers.get('Content-Type')?.includes('application/json')) {
+    responseData = await response.json()
+  } else {
+    responseData = await response.text()
+  }
+  return responseData
 }

@@ -3,19 +3,27 @@ import { computed, ref } from 'vue'
 import type { Room } from '@/types/types'
 import Players from '@/components/RoomPlayers.vue'
 import Player from '@/components/RoomPlayer.vue'
-import { useUsernameStore } from '@/stores/username'
+import { useRoomUserStore } from '@/stores/roomUser'
 
 const props = defineProps<{
   room: Room | null
+  isHost: boolean
 }>()
 
 const emit = defineEmits<{
   (e: 'openTimerMenu', value: boolean): void
 }>()
 
-const usernameStore = useUsernameStore()
+// Change this to use the server Data instead of the local one
+const getUsernameStore = () => {
+  if (!props.room) return null
+  return roomUserStore.getRoomUser(props.room!.id)?.username
+}
+
+const roomUserStore = useRoomUserStore()
 const isPlayersMenuOpen = ref<boolean>(false)
 const isPlayerMenuOpen = ref<boolean>(false)
+const usernameStore = ref<string>(getUsernameStore() || '')
 
 const togglePlayersMenu = () => {
   isPlayersMenuOpen.value = !isPlayersMenuOpen.value
@@ -27,12 +35,12 @@ const togglePlayerMenu = () => {
 
 const userData = computed(() => {
   if (!props.room) return null
-  return props.room.players.find((player) => player.name === usernameStore.username) || null
+  return props.room.players.find((player) => player.name === usernameStore.value)
 })
 </script>
 
 <template>
-  <nav v-if="room" class="flex justify-between m-1">
+  <nav class="flex justify-between m-1">
     <div class="flex">
       <div class="relative">
         <button @click="togglePlayersMenu" class="button">
@@ -42,9 +50,15 @@ const userData = computed(() => {
             <span>{{ room?.players.length }}</span>
           </div>
         </button>
-        <Players v-if="isPlayersMenuOpen" :players="room.players" :id="room.id.toString()" />
+        <Players
+          v-if="isPlayersMenuOpen"
+          :players="room!.players"
+          :id="room!.id"
+          :is-host="isHost"
+        />
       </div>
       <button
+        v-if="isHost"
         class="button-circle flex ml-2 justify-center items-center"
         @click="emit('openTimerMenu', true)"
       >
@@ -65,7 +79,7 @@ const userData = computed(() => {
         >
           <div class="relative">
             <span class="mr-7 portrait:max-w-[100px] truncate">
-              {{ usernameStore.username || 'Non défini' }}
+              {{ usernameStore || 'Non défini' }}
             </span>
             <svg
               class="absolute text-gray-700 transform -translate-y-1/2 fill-current w-5 h-5 -right-1 top-2.5 dark:text-dark-text"
@@ -79,7 +93,7 @@ const userData = computed(() => {
             </svg>
           </div>
         </button>
-        <Player v-if="isPlayerMenuOpen" :player="userData" :id="room.id.toString()" />
+        <Player v-if="isPlayerMenuOpen" :player="userData" :id="room!.id" />
       </div>
     </div>
   </nav>

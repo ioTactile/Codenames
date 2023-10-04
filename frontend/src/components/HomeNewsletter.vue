@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 
 defineProps<{
-  emplacement: string
+  location: string
 }>()
 
 const email = ref<string>('')
@@ -19,8 +19,8 @@ const subscribe = () => {
   <section
     class="flex flex-col sm:flex-row justify-center content-between text-white"
     :class="{
-      'bg-darkPurple': emplacement === 'home',
-      'bg-gray-200': emplacement === 'create'
+      'bg-darkPurple': location === 'home',
+      'bg-gray-200': location === 'create'
     }"
   >
     <div class="w-full py-4">
@@ -30,8 +30,8 @@ const subscribe = () => {
             for="email"
             class="font-bold mb-2 text-center"
             :class="{
-              'text-white': emplacement === 'home',
-              'text-black': emplacement === 'create'
+              'text-white': location === 'home',
+              'text-black': location === 'create'
             }"
           >
             Tenez-moi informé des nouvelles fonctionnalités et des actualités sur Codenames :
@@ -48,7 +48,7 @@ const subscribe = () => {
           type="submit"
           class="px-6 py-2 mt-2 rounded-xl border-2 text-white bg-purple hover:bg-darkPurple"
           :class="{
-            'border-white': emplacement === 'home'
+            'border-white': location === 'home'
           }"
         >
           S'inscrire
@@ -56,8 +56,8 @@ const subscribe = () => {
         <p
           class="text-sm mt-4 px-2 text-center"
           :class="{
-            'text-white': emplacement === 'home',
-            'text-black': emplacement === 'create'
+            'text-white': location === 'home',
+            'text-black': location === 'create'
           }"
         >
           En vous inscrivant à cette newsletter Codenames CGE, vous acceptez les conditions

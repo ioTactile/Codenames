@@ -19,7 +19,9 @@ export default {
         darkGray: '#727272',
         tutorial: '#FDE39C',
         'tutorial-desktop': 'hsla(86,70%,87%,.7)',
-        'green-online': '#3fda36'
+        'green-online': '#3fda36',
+        'red-team-bg': '#8f2b1c',
+        'red-light': '#e65831'
       },
       screens: {
         '1201px': '1201px',
@@ -30,7 +32,8 @@ export default {
       },
       boxShadow: {
         sharp: '4px 4px 0px 0px rgba(0, 0, 0, .59)',
-        inset: 'inset 2px 2px 0px 0px silver'
+        inset: 'inset 2px 2px 0px 0px silver',
+        bottom: '0 4px 0 0 rgba(0,0,0,.3)'
       },
       fontSize: {
         vw: '4.5vw'

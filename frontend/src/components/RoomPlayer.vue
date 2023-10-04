@@ -1,16 +1,23 @@
 <script setup lang="ts">
 import type { Player } from '@/types/types'
-import { useUsernameStore } from '@/stores/username'
+import { useRoomUserStore } from '@/stores/roomUser'
 import { onMounted, ref, watch } from 'vue'
 import { apiFetchData } from '@/utils/api'
+import { useRouter } from 'vue-router'
 
 const props = defineProps<{
-  id: string
-  player: Player | null
+  id: number
+  player: Player | null | undefined
 }>()
 
-const usernameStore = useUsernameStore()
-const username = ref<string>(usernameStore.username)
+const router = useRouter()
+
+const getRoomUser = () => {
+  return roomUserStore.getRoomUser(props.id)?.username
+}
+
+const roomUserStore = useRoomUserStore()
+const username = ref<string>(getRoomUser() || '')
 const isURLHidden = ref<boolean>(false)
 
 onMounted(() => {
@@ -36,6 +43,10 @@ watch(isURLHidden, (value) => {
 })
 
 const changeUsername = async () => {
+  if (!getRoomUser()) {
+    alert("Vous n'êtes pas dans ce salon")
+    router.push({ name: 'home' })
+  }
   if (!username.value) {
     alert('Veuillez choisir un pseudo')
     return
@@ -44,13 +55,13 @@ const changeUsername = async () => {
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', {
       action: 'change-username',
-      username: usernameStore.username,
+      username: getRoomUser(),
       newUsername: username.value
     })
   } catch (error) {
     console.error('Error:', error)
   } finally {
-    usernameStore.setUsername(username.value)
+    roomUserStore.setRoomUser(props.id, username.value)
   }
 }
 </script>

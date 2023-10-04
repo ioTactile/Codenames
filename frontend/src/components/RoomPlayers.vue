@@ -3,8 +3,9 @@ import type { Player } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
 
 const props = defineProps<{
-  id: string
+  id: number
   players: Player[]
+  isHost: boolean
 }>()
 
 const copyLink = () => {
@@ -15,7 +16,7 @@ const copyLink = () => {
 
 const shufflePlayers = async () => {
   try {
-    await apiFetchData(`room/${props.id}`, 'GET', { action: 'shuffle-players' })
+    await apiFetchData(`room/${props.id}`, 'PUT', { action: 'shuffle-players' })
   } catch (error) {
     console.error('Error:', error)
   } finally {
@@ -25,7 +26,7 @@ const shufflePlayers = async () => {
 
 const resetPlayers = async () => {
   try {
-    await apiFetchData(`room/${props.id}`, 'GET', { action: 'reset-players' })
+    await apiFetchData(`room/${props.id}`, 'PUT', { action: 'reset-players' })
   } catch (error) {
     console.error('Error:', error)
   } finally {
@@ -65,15 +66,17 @@ const resetPlayers = async () => {
           </div>
         </div>
       </div>
-      <hr class="border-gray-300" />
-      <div class="p-2 bg-gray-200 text-center rounded-bl-xl rounded-br-xl">
-        <div class="m-2 inline-block">
-          <button @click="shufflePlayers" class="button">Répartir les équipes au hasard</button>
+      <template v-if="isHost">
+        <hr class="border-gray-300" />
+        <div class="p-2 bg-gray-200 text-center rounded-bl-xl rounded-br-xl">
+          <div class="m-2 inline-block">
+            <button @click="shufflePlayers" class="button">Répartir les équipes au hasard</button>
+          </div>
+          <div class="m-2 inline-block">
+            <button @click="resetPlayers" class="button">Réinitialiser les équipes</button>
+          </div>
         </div>
-        <div class="m-2 inline-block">
-          <button @click="resetPlayers" class="button">Réinitialiser les équipes</button>
-        </div>
-      </div>
+      </template>
     </div>
   </div>
 </template>

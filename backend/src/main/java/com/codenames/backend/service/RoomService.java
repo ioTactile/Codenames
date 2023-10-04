@@ -144,7 +144,7 @@ public class RoomService {
         roomRepository.save(room);
     }
 
-    public void selectRole(Long roomId, String role, String pseudo) {
+    public void selectRole(Long roomId, String role, String team, String pseudo) {
         Room room = getRoomById(roomId);
         if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
             throw new IllegalArgumentException("Room not found or not pending");
@@ -155,14 +155,14 @@ public class RoomService {
             throw new IllegalArgumentException("Player not found");
         }
         if (role.equals(PlayerRole.SPYMASTER.toString())) {
-            for (Player p : room.getPlayers()) {
-                if (p.getPlayerTeam().equals(player.getPlayerTeam())
-                        && p.getPlayerRole().equals(PlayerRole.SPYMASTER)) {
-                    p.setPlayerRole(PlayerRole.OPERATIVE);
-                }
+            if (room.getPlayers().stream()
+                    .anyMatch(p -> p.getPlayerRole().equals(PlayerRole.SPYMASTER) &&
+                            p.getPlayerTeam().toString().equals(team))) {
+                throw new IllegalArgumentException("There is already a spymaster in the right team");
             }
         }
         player.setPlayerRole(mapStringToPlayerRole(role));
+        player.setPlayerTeam(mapStringToPlayerTeam(team));
         roomRepository.save(room);
     }
 
@@ -198,11 +198,11 @@ public class RoomService {
         }
         for (Player player : redPlayers) {
             player.setPlayerTeam(PlayerTeam.RED);
-            player.setPlayerRole(PlayerRole.NONE);
+            player.setPlayerRole(PlayerRole.OPERATIVE);
         }
         for (Player player : bluePlayers) {
             player.setPlayerTeam(PlayerTeam.BLUE);
-            player.setPlayerRole(PlayerRole.NONE);
+            player.setPlayerRole(PlayerRole.OPERATIVE);
         }
         room.getPlayers().clear();
         room.getPlayers().addAll(bluePlayers);

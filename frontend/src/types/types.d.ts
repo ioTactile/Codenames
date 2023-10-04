@@ -1,12 +1,12 @@
 export type Room = {
-  id: string
+  id: number
   players: Player[]
   words: Word[]
   clues: Clue[]
   teamTurn: 'BLUE' | 'RED'
   status: 'NEW' | 'PENDING' | 'IN_PROGRESS' | 'RED_TEAM_WINS' | 'BLUE_TEAM_WINS'
-  redReimainingWords: number
-  blueReimainingWords: number
+  redRemainingWords: number
+  blueRemainingWords: number
   isBlackCard: boolean
   createdAt: LocalDateTime
   updatedAt: LocalDateTime
@@ -30,4 +30,9 @@ export type Clue = {
   attemps: number
   remaining: number
   spyName: string
+}
+
+export type RoomUser = {
+  roomId: number
+  username: string
 }

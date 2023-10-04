@@ -75,7 +75,7 @@ import Footer from '@/components/HomeFooter.vue'
       </div>
     </div>
   </main>
-  <Newsletter emplacement="home" />
+  <Newsletter location="home" />
   <Faq />
   <Footer />
 </template>
