@@ -10,6 +10,11 @@ const props = defineProps<{
 
 const roomUserStore = useRoomUserStore()
 
+const getUsernameStore = () => {
+  if (!props.room) return null
+  return roomUserStore.getRoomUser(props.room!.id)?.username
+}
+
 const redAgents = computed(() => {
   if (!props.room) return []
   return props.room.players.filter(
@@ -29,9 +34,17 @@ const nonePlayers = computed(() => {
   return props.room.players.filter((player) => player.playerTeam === 'NONE')
 })
 
+const isInTeamRed = () => {
+  if (!props.room) return false
+  const usernameStore = getUsernameStore()
+  return !!props.room.players.some(
+    (player) => player.playerTeam === 'RED' && player.name === usernameStore
+  )
+}
+
 const isInTeamBlue = () => {
   if (!props.room) return false
-  const usernameStore = roomUserStore.getRoomUser(props.room.id!)?.username
+  const usernameStore = getUsernameStore()
   return !!props.room.players.some(
     (player) => player.playerTeam === 'BLUE' && player.name === usernameStore
   )
@@ -93,7 +106,11 @@ const joinRole = async (role: string) => {
             </div>
           </div>
           <div v-else class="pl-2 text-white">–</div>
-          <button v-if="nonePlayers.length" class="button" @click="joinRole('SPYMASTER')">
+          <button
+            v-if="!redSpymaster.length && isInTeamRed()"
+            class="button"
+            @click="joinRole('SPYMASTER')"
+          >
             Rejoindre en tant qu'espion
           </button>
         </section>

@@ -38,6 +38,8 @@ public class Room {
 
     @Column(name = "team_turn", nullable = false)
     private String teamTurn;
+    @Column(name = "role_turn", nullable = false)
+    private String roleTurn;
     @Column(name = "status", nullable = false)
     private RoomStatus status;
     @Column(name = "red_remaining_words", nullable = false)
@@ -60,6 +62,7 @@ public class Room {
             List<Word> words,
             List<Clue> clues,
             String teamTurn,
+            String roleTurn,
             RoomStatus status,
             int redRemainingWords,
             int blueRemainingWords,
@@ -71,6 +74,7 @@ public class Room {
         this.words = words;
         this.clues = clues;
         this.teamTurn = teamTurn;
+        this.roleTurn = roleTurn;
         this.status = status;
         this.redRemainingWords = redRemainingWords;
         this.blueRemainingWords = blueRemainingWords;
@@ -84,6 +88,7 @@ public class Room {
             List<Word> words,
             List<Clue> clues,
             String teamTurn,
+            String roleTurn,
             RoomStatus status,
             int redRemainingWords,
             int blueRemainingWords,
@@ -94,6 +99,7 @@ public class Room {
         this.words = words;
         this.clues = clues;
         this.teamTurn = teamTurn;
+        this.roleTurn = roleTurn;
         this.status = status;
         this.redRemainingWords = redRemainingWords;
         this.blueRemainingWords = blueRemainingWords;
@@ -116,6 +122,14 @@ public class Room {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public String getRoleTurn() {
+        return roleTurn;
+    }
+
+    public void setRoleTurn(String roleTurn) {
+        this.roleTurn = roleTurn;
     }
 
     public List<Word> getWords() {

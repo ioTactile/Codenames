@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fira+Sans+Extra+Condensed&family=Nunito:wght@400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -13,6 +14,7 @@ body {
   background-color: #000000;
   padding: 0;
   font-size: 16px;
+  overflow: hidden;
 }
 
 .button {
@@ -45,25 +47,25 @@ body {
 .color-beige {
   background-color: rgb(219, 212, 175) !important;
   border-width: 1px 1px 2px !important;
-  border-style: solid;
   border-color: rgb(234, 230, 208) rgb(219, 212, 175) rgb(186, 180, 149) !important;
-  border-image: inital;
 }
 
 .color-red {
   background-color: rgb(255, 136, 30) !important;
   border-width: 1px 1px 2px !important;
-  border-style: solid;
   border-color: rgb(255, 185, 123) rgb(255, 136, 30) rgb(217, 116, 26) !important;
-  border-image: inital;
 }
 
 .color-blue {
   background-color: rgb(68, 200, 255) !important;
   border-width: 1px 1px 2px !important;
-  border-style: solid;
   border-color: rgb(145, 223, 255) rgb(68, 200, 255) rgb(63, 167, 211) !important;
-  border-image: inital;
+}
+
+.color-green {
+  background-color: rgb(106, 233, 17) !important;
+  border-width: 1px 1px 2px !important;
+  border-color: rgb(199, 247, 156) rgb(106, 233, 17) rgb(95, 163, 19) !important;
 }
 
 @layer utilities {

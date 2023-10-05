@@ -77,6 +77,7 @@ const resetPlayers = async () => {
           </div>
         </div>
       </template>
+      <div v-else class="p-2 bg-gray-200 text-center rounded-bl-xl rounded-br-xl"></div>
     </div>
   </div>
 </template>

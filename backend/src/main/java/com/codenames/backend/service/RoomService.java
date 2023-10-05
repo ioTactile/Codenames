@@ -60,6 +60,7 @@ public class RoomService {
             room.setTeamTurn(PlayerTeam.BLUE.toString());
         }
 
+        room.setRoleTurn(PlayerRole.SPYMASTER.toString());
         room.setRedRemainingWords(redCount);
         room.setBlueRemainingWords(blueCount);
         room.setIsBlackCardSelected(false);
@@ -122,9 +123,9 @@ public class RoomService {
         if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
             throw new IllegalArgumentException("Room not found or not pending");
         }
-        if (room.getPlayers().size() < 4) {
-            throw new IllegalArgumentException("Not enough players");
-        }
+        // if (room.getPlayers().size() < 4) {
+        // throw new IllegalArgumentException("Not enough players");
+        // }
         room.setStatus(RoomStatus.IN_PROGRESS);
         room.setUpdatedAt(LocalDateTime.now());
         roomRepository.save(room);
@@ -232,6 +233,7 @@ public class RoomService {
         } else {
             room.setTeamTurn(PlayerTeam.RED.toString());
         }
+        room.setRoleTurn(PlayerRole.SPYMASTER.toString());
         roomRepository.save(room);
     }
 
@@ -353,6 +355,7 @@ public class RoomService {
             throw new IllegalArgumentException("Clue name is a word from the board");
         }
         room.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), clue.getAttempts(), player.getName()));
+        room.setRoleTurn(PlayerRole.OPERATIVE.toString());
         roomRepository.save(room);
     }
 

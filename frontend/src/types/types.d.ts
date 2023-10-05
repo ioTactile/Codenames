@@ -4,6 +4,7 @@ export type Room = {
   words: Word[]
   clues: Clue[]
   teamTurn: 'BLUE' | 'RED'
+  roleTurn: 'SPYMASTER' | 'OPERATIVE'
   status: 'NEW' | 'PENDING' | 'IN_PROGRESS' | 'RED_TEAM_WINS' | 'BLUE_TEAM_WINS'
   redRemainingWords: number
   blueRemainingWords: number

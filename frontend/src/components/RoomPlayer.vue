@@ -58,10 +58,22 @@ const changeUsername = async () => {
       username: getRoomUser(),
       newUsername: username.value
     })
+    roomUserStore.setRoomUser(props.id, username.value)
   } catch (error) {
     console.error('Error:', error)
-  } finally {
-    roomUserStore.setRoomUser(props.id, username.value)
+  }
+}
+
+const leaveRoom = async () => {
+  try {
+    await apiFetchData(`room/${props.id}`, 'PUT', {
+      action: 'leave',
+      username: getRoomUser()
+    })
+    roomUserStore.removeRoomUser(props.id, username.value)
+    router.push({ name: 'home' })
+  } catch (error) {
+    console.error('Error:', error)
   }
 }
 </script>
@@ -102,6 +114,33 @@ const changeUsername = async () => {
           <p class="flex-1">Cacher l'URL du salon dans la barre d'adresse</p>
         </div>
       </div>
+      <hr class="border-gray-300" />
+      <div class="flex justify-center py-4 bg-gray-200 rounded-bl-xl rounded-br-xl">
+        <button class="button shadow-bottom text-base" @click="leaveRoom">
+          <div class="flex items-center justify-center">
+            <svg
+              class="flex-none w-5 mr-2 text-black fill-current"
+              xmlns="http://www.w3.org/2000/svg"
+              x="0px"
+              y="0px"
+              viewBox="0 0 48 48"
+            >
+              <g>
+                <polygon
+                  points="39.3,24.1 26.1,24.1 26.1,17.4 39.3,17.4 39.3,12.4 47,20.7 39.3,29.1 "
+                ></polygon>
+                <polygon points="19.2,47 2.5,39 2.5,2.5 19.2,10.4"></polygon>
+              </g>
+              <g>
+                <path
+                  d="M32.1,40.5H2.5C1.7,40.5,1,39.8,1,39V2.5C1,1.7,1.7,1,2.5,1h29.6c0.8,0,1.5,0.7,1.5,1.5v9.2    c0,0.8-0.7,1.5-1.5,1.5c-0.8,0-1.5-0.7-1.5-1.5V3.9H4v33.7h26.6v-7.7c0-0.8,0.7-1.5,1.5-1.5c0.8,0,1.5,0.7,1.5,1.5V39    C33.5,39.8,32.9,40.5,32.1,40.5z"
+                ></path>
+              </g>
+            </svg>
+            <div class="flex-1">Quitter le salon</div>
+          </div>
+        </button>
+      </div>
     </div>
   </div>
 </template>
@@ -112,7 +151,7 @@ const changeUsername = async () => {
   position: absolute;
   width: 360px;
   inset: 0px auto auto 0px;
-  transform: translateX(-265px) translateY(45px);
+  transform: translateX(-265px) translateY(45px) translateZ(0px);
 }
 
 .switch {

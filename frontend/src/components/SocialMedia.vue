@@ -1,0 +1,31 @@
+<template>
+  <aside class="flex items-center justify-center mx-6 mt-2 gap-3">
+    <a
+      href="http://www.facebook.com/codenamesgame/"
+      target="_blank"
+      class="bg-white rounded-full opacity-75 hover:opacity-90 w-8 h-8 landscape:w-10 landscape:h-10"
+    >
+      <div class="w-full h-full flex justify-center items-center">
+        <img src="/images/facebook.svg" alt="Facebook icon" class="w-7/12" />
+      </div>
+    </a>
+    <a
+      href="http://twitter.com/CodenamesGame"
+      target="_blank"
+      class="bg-white rounded-full opacity-75 hover:opacity-90 w-8 h-8 landscape:w-10 landscape:h-10"
+    >
+      <div class="w-full h-full flex justify-center items-center">
+        <img src="/images/twitter.svg" alt="Twitter icon" class="w-7/12" />
+      </div>
+    </a>
+    <a
+      href="http://www.instagram.com/codenamesgame/"
+      target="_blank"
+      class="bg-white rounded-full opacity-75 hover:opacity-90 w-8 h-8 landscape:w-10 landscape:h-10"
+    >
+      <div class="w-full h-full flex justify-center items-center">
+        <img src="/images/instagram.svg" alt="Instagram icon" class="w-7/12" />
+      </div>
+    </a>
+  </aside>
+</template>

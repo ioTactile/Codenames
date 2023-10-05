@@ -21,7 +21,9 @@ export default {
         'tutorial-desktop': 'hsla(86,70%,87%,.7)',
         'green-online': '#3fda36',
         'red-team-bg': '#8f2b1c',
-        'red-light': '#e65831'
+        'red-light': '#e65831',
+        'blue-team-bg': '#3284a3',
+        'blue-light': '#7bcae9'
       },
       screens: {
         '1201px': '1201px',
@@ -50,6 +52,9 @@ export default {
       },
       spacing: {
         '50': '50px'
+      },
+      fontFamily: {
+        fira: ['Fira Sans Extra Condensed', 'sans-serif']
       }
     }
   },

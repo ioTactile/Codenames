@@ -40,10 +40,10 @@ const userData = computed(() => {
 </script>
 
 <template>
-  <nav class="flex justify-between m-1">
+  <nav class="flex justify-between m-1 px-2">
     <div class="flex">
       <div class="relative">
-        <button @click="togglePlayersMenu" class="button">
+        <button @click="togglePlayersMenu" class="button shadow-bottom">
           <div class="flex items-center justify-center">
             <span>Joueurs :</span>
             <img src="/images/icon_player.png" alt="Icon player" class="h-4 mr-1 landscape:ml-2" />
@@ -59,17 +59,17 @@ const userData = computed(() => {
       </div>
       <button
         v-if="isHost"
-        class="button-circle flex ml-2 justify-center items-center"
+        class="button-circle flex ml-2 justify-center items-center shadow-bottom"
         @click="emit('openTimerMenu', true)"
       >
         <img src="/images/timer.png" alt="Timer icon" class="w-3/4 pointer-events-none" />
       </button>
     </div>
     <div class="flex">
-      <button class="button mx-2">Règles</button>
+      <button class="button shadow-bottom mx-2">Règles</button>
       <div class="relative">
         <button
-          class="button"
+          class="button shadow-bottom"
           :class="{
             'color-beige': userData?.playerTeam === 'NONE',
             'color-red': userData?.playerTeam === 'RED',
