@@ -68,120 +68,68 @@ public class RoomController {
         switch (action) {
             case "join":
                 roomService.joinRoom(id, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/join", username);
+                Room updatedRoomJoin = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/join", updatedRoomJoin);
                 return ResponseEntity.ok("Room joined");
             case "leave":
                 roomService.leaveRoom(id, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/leave", username);
+                Room updatedRoomLeave = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/leave", updatedRoomLeave);
                 return ResponseEntity.ok("Room left");
             case "start":
                 roomService.startRoom(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/start", id);
+                Room updatedRoomStart = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/start", updatedRoomStart);
                 return ResponseEntity.ok("Room started");
             case "shuffle-players":
                 roomService.shufflePlayers(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/shuffle-players", id);
+                Room updatedRoomShufflePlayers = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/shuffle-players", updatedRoomShufflePlayers);
                 return ResponseEntity.ok("Players shuffled");
             case "reset-players":
                 roomService.resetPlayers(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/reset-players", id);
+                Room updatedRoomResetPlayers = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/reset-players", updatedRoomResetPlayers);
                 return ResponseEntity.ok("Players reset");
             case "select-team":
                 roomService.selectTeam(id, team, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-team", id);
+                Room updatedRoomSelectTeam = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-team", updatedRoomSelectTeam);
                 return ResponseEntity.ok("Team selected");
             case "select-role":
                 roomService.selectRole(id, role, team, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-role", id);
+                Room updatedRoomSelectRole = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-role", updatedRoomSelectRole);
                 return ResponseEntity.ok("Role selected");
             case "change-username":
                 roomService.changeUsername(id, username, newUsername);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/change-username", id);
+                Room updatedRoomChangeUsername = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/change-username", updatedRoomChangeUsername);
                 return ResponseEntity.ok("Username changed");
             case "manual-team-turn":
                 roomService.manualTeamTurn(id, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/manual-team-turn", id);
+                Room updatedRoomManualTeamTurn = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/manual-team-turn", updatedRoomManualTeamTurn);
                 return ResponseEntity.ok("Team turn changed");
             case "select-word":
                 roomService.selectWord(id, wordname, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-word", id);
+                Room updatedRoomSelectWord = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-word", updatedRoomSelectWord);
                 return ResponseEntity.ok("Word selected");
             case "click-word":
                 roomService.clickWord(id, wordname, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/click-word", id);
+                Room updatedRoomClickWord = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/click-word", updatedRoomClickWord);
                 return ResponseEntity.ok("Word clicked");
             case "add-clue":
                 ObjectMapper mapper = new ObjectMapper();
                 Clue clue = mapper.convertValue(requestPayload.get("clue"), Clue.class);
                 roomService.addClue(id, clue, username);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/add-clue", id);
+                Room updatedRoomAddClue = roomService.getRoomById(id);
+                messagingTemplate.convertAndSend("/topic/room/" + id + "/add-clue", updatedRoomAddClue);
                 return ResponseEntity.ok("Clue added");
             default:
                 return ResponseEntity.badRequest().body("Invalid action");
         }
     }
-
-    // @PutMapping("/{id}/join")
-    // public ResponseEntity<String> join(@PathVariable("id") Long id, @RequestBody
-    // String pseudo) {
-    // sessionService.joinSession(id, pseudo);
-    // messagingTemplate.convertAndSend("/topic/session/" + id + "/join", pseudo);
-    // return ResponseEntity.ok("Session joined");
-    // }
-
-    // @PutMapping("/{id}/leave")
-    // public ResponseEntity<String> leave(@PathVariable("id") Long id, @RequestBody
-    // String pseudo) {
-    // sessionService.leaveSession(id, pseudo);
-    // messagingTemplate.convertAndSend("/topic/session/" + id + "/leave", pseudo);
-    // return ResponseEntity.ok("Session left");
-    // }
-
-    // @PutMapping("/{id}/start")
-    // public ResponseEntity<String> start(@PathVariable("id") Long id) {
-    // sessionService.startSession(id);
-    // messagingTemplate.convertAndSend("/topic/session/" + id + "/start", id);
-    // return ResponseEntity.ok("Session started");
-    // }
-
-    // @PutMapping("/{id}/shuffle-players")
-    // public ResponseEntity<String> shufflePlayers(@PathVariable("id") Long id) {
-    // sessionService.shufflePlayers(id);
-    // return ResponseEntity.ok("Players shuffled");
-    // }
-
-    // @PutMapping("/{id}/select-team")
-    // public ResponseEntity<String> selectTeam(@PathVariable("id") Long id,
-    // @RequestBody Player player, @RequestBody String team) {
-    // sessionService.selectTeam(id, player, team);
-    // return ResponseEntity.ok("Team selected");
-    // }
-
-    // @PutMapping("/{id}/select-role")
-    // public ResponseEntity<String> selectRole(@PathVariable("id") Long id,
-    // @RequestBody Player player, @RequestBody String role) {
-    // sessionService.selectRole(id, player, role);
-    // return ResponseEntity.ok("Role selected");
-    // }
-
-    // @PutMapping("/{id}/select-word")
-    // public ResponseEntity<String> selectWord(@PathVariable("id") Long id,
-    // @RequestBody Word word, @RequestBody Player player) {
-    // sessionService.selectWord(id, word, player);
-    // return ResponseEntity.ok("Word selected");
-    // }
-
-    // @PutMapping("/{id}/click-word")
-    // public ResponseEntity<String> clickWord(@PathVariable("id") Long id,
-    // @RequestBody Word word, @RequestBody Player player) {
-    // sessionService.clickWord(id, word, player);
-    // return ResponseEntity.ok("Word clicked");
-    // }
-
-    // @PutMapping("/{id}/add-clue")
-    // public ResponseEntity<String> addClue(@PathVariable("id") Long id,
-    // @RequestBody Clue clue, @RequestBody Player player) {
-    // sessionService.addClue(id, clue, player);
-    // return ResponseEntity.ok("Clue added");
-    // }
 }

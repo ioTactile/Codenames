@@ -66,7 +66,7 @@ const selectWord = async (word: Word) => {
           class="card-image relative"
           :class="{
             red: word.wordColor === 'RED' && isUserSpy,
-            white: !isUserSpy,
+            white: !isUserSpy || (word.wordColor === 'WHITE' && isUserSpy),
             blue: word.wordColor === 'BLUE' && isUserSpy,
             black: word.wordColor === 'BLACK' && isUserSpy
           }"

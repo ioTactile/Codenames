@@ -28,7 +28,7 @@ export type Word = {
 
 export type Clue = {
   clueName: string
-  attemps: number
+  attempts: number
   remaining: number
   spyName: string
 }

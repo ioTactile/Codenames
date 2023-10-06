@@ -14,8 +14,11 @@ import SocialMedia from '@/components/SocialMedia.vue'
 import TimerModal from '@/components/RoomTimerModal.vue'
 import { apiFetchData } from '@/utils/api'
 import { useRoomUserStore } from '@/stores/roomUser'
+import { Client, Stomp } from '@stomp/stompjs'
+import SockJS from 'sockjs-client/dist/sockjs.min.js'
 
 const room = ref<Room | null>(null)
+const stompClient = ref<Client | null>(null)
 const props = defineProps<{
   id: number
 }>()
@@ -39,6 +42,12 @@ const getUserTeam = computed(() => {
   return user?.playerTeam
 })
 
+const getUser = () => {
+  return !!room.value?.players.some(
+    (player) => player.name === roomUserStore.getRoomUser(room.value!.id)?.username
+  )
+}
+
 onMounted(async () => {
   const roomId = props.id
   if (!roomId) {
@@ -46,18 +55,44 @@ onMounted(async () => {
     return
   }
 
-  try {
-    const data: Room = await apiFetchData(`room/${roomId}`, 'GET')
-    room.value = data
-    console.log('data', data)
-    isRoomUser.value = !!room.value?.players.some(
-      (player) => player.name === roomUserStore.getRoomUser(room.value!.id)?.username
-    )
-    isLoading.value = false
-  } catch (error) {
-    console.error('Error:', error)
-  }
+  // try {
+  //   const data: Room = await apiFetchData(`room/${roomId}`, 'GET')
+  //   room.value = data
+  //   console.log('data', data)
+  //   isRoomUser.value = getUser()
+  //   isLoading.value = false
+  // } catch (error) {
+  //   console.error('Error:', error)
+  // }
+
+  initializeStompClient()
+  isRoomUser.value = getUser()
+  isLoading.value = false
 })
+
+const handleRoomUpdate = (data: Room) => {
+  room.value = data
+}
+
+const initializeStompClient = () => {
+  const socket = new SockJS('http://localhost:8080/ws')
+  const client = Stomp.over(socket)
+
+  client.connect({}, () => {
+    stompClient.value = client
+    subscribeToRoom()
+  })
+}
+
+const subscribeToRoom = () => {
+  const roomId = props.id
+  if (!roomId) return
+  if (!stompClient.value) return
+  stompClient.value.subscribe(`/topic/room/${roomId}`, (data: any) => {
+    const roomData: Room = JSON.parse(data.body)
+    handleRoomUpdate(roomData)
+  })
+}
 </script>
 
 <template>
