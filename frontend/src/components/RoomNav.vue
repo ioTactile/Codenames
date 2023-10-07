@@ -1,29 +1,21 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import type { Room } from '@/types/types'
+import { ref } from 'vue'
+import type { Player as P, Room } from '@/types/types'
 import Players from '@/components/RoomPlayers.vue'
 import Player from '@/components/RoomPlayer.vue'
-import { useRoomUserStore } from '@/stores/roomUser'
 
-const props = defineProps<{
-  room: Room | null
+defineProps<{
+  room: Room
   isHost: boolean
+  user: P | null
 }>()
 
 const emit = defineEmits<{
   (e: 'openTimerMenu', value: boolean): void
 }>()
 
-// Change this to use the server Data instead of the local one
-const getUsernameStore = () => {
-  if (!props.room) return null
-  return roomUserStore.getRoomUser(props.room!.id)?.username
-}
-
-const roomUserStore = useRoomUserStore()
 const isPlayersMenuOpen = ref<boolean>(false)
 const isPlayerMenuOpen = ref<boolean>(false)
-const usernameStore = ref<string>(getUsernameStore() || '')
 
 const togglePlayersMenu = () => {
   isPlayersMenuOpen.value = !isPlayersMenuOpen.value
@@ -32,11 +24,6 @@ const togglePlayersMenu = () => {
 const togglePlayerMenu = () => {
   isPlayerMenuOpen.value = !isPlayerMenuOpen.value
 }
-
-const userData = computed(() => {
-  if (!props.room) return null
-  return props.room.players.find((player) => player.name === usernameStore.value)
-})
 </script>
 
 <template>
@@ -50,12 +37,7 @@ const userData = computed(() => {
             <span>{{ room?.players.length }}</span>
           </div>
         </button>
-        <Players
-          v-if="isPlayersMenuOpen"
-          :players="room!.players"
-          :id="room!.id"
-          :is-host="isHost"
-        />
+        <Players v-if="isPlayersMenuOpen" :players="room.players" :id="room.id" :is-host="isHost" />
       </div>
       <button
         v-if="isHost"
@@ -71,15 +53,15 @@ const userData = computed(() => {
         <button
           class="button shadow-bottom"
           :class="{
-            'color-beige': userData?.playerTeam === 'NONE',
-            'color-red': userData?.playerTeam === 'RED',
-            'color-blue': userData?.playerTeam === 'BLUE'
+            'color-beige': user?.playerTeam === 'NONE',
+            'color-red': user?.playerTeam === 'RED',
+            'color-blue': user?.playerTeam === 'BLUE'
           }"
           @click="togglePlayerMenu"
         >
           <div class="relative">
             <span class="mr-7 portrait:max-w-[100px] truncate">
-              {{ usernameStore || 'Non défini' }}
+              {{ user?.name || 'Non défini' }}
             </span>
             <svg
               class="absolute text-gray-700 transform -translate-y-1/2 fill-current w-5 h-5 -right-1 top-2.5 dark:text-dark-text"
@@ -93,7 +75,7 @@ const userData = computed(() => {
             </svg>
           </div>
         </button>
-        <Player v-if="isPlayerMenuOpen" :player="userData" :id="room!.id" />
+        <Player v-if="isPlayerMenuOpen" :player="user" :id="room.id" />
       </div>
     </div>
   </nav>

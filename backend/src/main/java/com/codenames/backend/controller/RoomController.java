@@ -31,6 +31,10 @@ public class RoomController {
         this.messagingTemplate = messagingTemplate;
     }
 
+    private void sendRoomUpdate(Room room) {
+        messagingTemplate.convertAndSend("/topic/room/" + room.getId(), room);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Room> create(@RequestBody Map<String, String> requestPayload) {
         String username = requestPayload.get("username");
@@ -68,65 +72,65 @@ public class RoomController {
         switch (action) {
             case "join":
                 roomService.joinRoom(id, username);
-                Room updatedRoomJoin = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/join", updatedRoomJoin);
+                Room roomJoin = roomService.getRoomById(id);
+                sendRoomUpdate(roomJoin);
                 return ResponseEntity.ok("Room joined");
             case "leave":
                 roomService.leaveRoom(id, username);
-                Room updatedRoomLeave = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/leave", updatedRoomLeave);
+                Room roomLeave = roomService.getRoomById(id);
+                sendRoomUpdate(roomLeave);
                 return ResponseEntity.ok("Room left");
             case "start":
                 roomService.startRoom(id);
-                Room updatedRoomStart = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/start", updatedRoomStart);
+                Room roomStart = roomService.getRoomById(id);
+                sendRoomUpdate(roomStart);
                 return ResponseEntity.ok("Room started");
             case "shuffle-players":
                 roomService.shufflePlayers(id);
-                Room updatedRoomShufflePlayers = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/shuffle-players", updatedRoomShufflePlayers);
+                Room roomShuffle = roomService.getRoomById(id);
+                sendRoomUpdate(roomShuffle);
                 return ResponseEntity.ok("Players shuffled");
             case "reset-players":
                 roomService.resetPlayers(id);
-                Room updatedRoomResetPlayers = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/reset-players", updatedRoomResetPlayers);
+                Room roomReset = roomService.getRoomById(id);
+                sendRoomUpdate(roomReset);
                 return ResponseEntity.ok("Players reset");
             case "select-team":
                 roomService.selectTeam(id, team, username);
-                Room updatedRoomSelectTeam = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-team", updatedRoomSelectTeam);
+                Room roomSelectTeam = roomService.getRoomById(id);
+                sendRoomUpdate(roomSelectTeam);
                 return ResponseEntity.ok("Team selected");
             case "select-role":
                 roomService.selectRole(id, role, team, username);
-                Room updatedRoomSelectRole = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-role", updatedRoomSelectRole);
+                Room roomSelectRole = roomService.getRoomById(id);
+                sendRoomUpdate(roomSelectRole);
                 return ResponseEntity.ok("Role selected");
             case "change-username":
                 roomService.changeUsername(id, username, newUsername);
-                Room updatedRoomChangeUsername = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/change-username", updatedRoomChangeUsername);
+                Room roomChangeUsername = roomService.getRoomById(id);
+                sendRoomUpdate(roomChangeUsername);
                 return ResponseEntity.ok("Username changed");
             case "manual-team-turn":
                 roomService.manualTeamTurn(id, username);
-                Room updatedRoomManualTeamTurn = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/manual-team-turn", updatedRoomManualTeamTurn);
+                Room roomManualTeamTurn = roomService.getRoomById(id);
+                sendRoomUpdate(roomManualTeamTurn);
                 return ResponseEntity.ok("Team turn changed");
             case "select-word":
                 roomService.selectWord(id, wordname, username);
-                Room updatedRoomSelectWord = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/select-word", updatedRoomSelectWord);
+                Room roomSelectWord = roomService.getRoomById(id);
+                sendRoomUpdate(roomSelectWord);
                 return ResponseEntity.ok("Word selected");
             case "click-word":
                 roomService.clickWord(id, wordname, username);
-                Room updatedRoomClickWord = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/click-word", updatedRoomClickWord);
+                Room roomClickWord = roomService.getRoomById(id);
+                sendRoomUpdate(roomClickWord);
                 return ResponseEntity.ok("Word clicked");
             case "add-clue":
                 ObjectMapper mapper = new ObjectMapper();
                 Clue clue = mapper.convertValue(requestPayload.get("clue"), Clue.class);
                 roomService.addClue(id, clue, username);
-                Room updatedRoomAddClue = roomService.getRoomById(id);
-                messagingTemplate.convertAndSend("/topic/room/" + id + "/add-clue", updatedRoomAddClue);
+                Room roomAddClue = roomService.getRoomById(id);
+                sendRoomUpdate(roomAddClue);
                 return ResponseEntity.ok("Clue added");
             default:
                 return ResponseEntity.badRequest().body("Invalid action");

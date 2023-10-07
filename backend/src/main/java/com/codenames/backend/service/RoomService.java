@@ -269,12 +269,16 @@ public class RoomService {
             throw new IllegalArgumentException("Word not found");
         }
         if (player.getPlayerTeam().toString().equals(room.getTeamTurn())) {
-            if (word.getWordState().equals(WordState.SELECTED)) {
-                word.setWordState(WordState.NOT_SELECTED);
+            if (word.getSelectedBy().contains(player.getName())) {
                 word.getSelectedBy().remove(player.getName());
+            } else {
+                word.getSelectedBy().add(player.getName());
             }
-            word.setWordState(WordState.SELECTED);
-            word.getSelectedBy().add(player.getName());
+            if (word.getSelectedBy().size() == 0) {
+                word.setWordState(WordState.NOT_SELECTED);
+            } else {
+                word.setWordState(WordState.SELECTED);
+            }
             roomRepository.save(room);
         } else {
             throw new IllegalArgumentException("Player is not on the right team");
@@ -301,6 +305,7 @@ public class RoomService {
                 return;
             }
             word.setWordState(WordState.CLICKED);
+            word.setSelectedBy(new ArrayList<>());
             if (word.getWordColor() == WordColor.RED) {
                 room.setRedRemainingWords(room.getRedRemainingWords() - 1);
             } else if (word.getWordColor() == WordColor.BLUE) {

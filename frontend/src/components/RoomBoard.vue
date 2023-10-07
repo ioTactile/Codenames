@@ -1,40 +1,31 @@
 <script setup lang="ts">
-import type { Room, Word } from '@/types/types'
-import { useRoomUserStore } from '@/stores/roomUser'
+import type { Room, Word, Player } from '@/types/types'
 import { computed } from 'vue'
 import { apiFetchData } from '@/utils/api'
 
 const props = defineProps<{
-  room: Room | null
+  room: Room
+  user: Player | null
 }>()
 
-const roomUserStore = useRoomUserStore()
+const isUserTeamTurn = computed(() => {
+  return !!props.room.players.find(
+    (player) => player.name === props.user?.name && player.playerTeam === props.room.teamTurn
+  )
+})
 
-const getUsernameStore = () => {
-  if (!props.room) return null
-  return roomUserStore.getRoomUser(props.room!.id)?.username
+const isUserSpy = () => {
+  return props.user?.playerRole === 'SPYMASTER'
 }
 
-const isUserSpy = computed(() => {
-  return !!props.room?.players.find(
-    (player) => player.name === getUsernameStore() && player.playerRole === 'SPYMASTER'
-  )
-})
-
-const isUserTeamTurn = computed(() => {
-  return !!props.room?.players.find(
-    (player) => player.name === getUsernameStore() && player.playerTeam === props.room?.teamTurn
-  )
-})
-
 const clickWord = async (word: Word) => {
-  if (isUserSpy.value) return
+  if (isUserSpy()) return
   if (!isUserTeamTurn.value) return
-  const roomId = props.room?.id
+  const roomId = props.room.id
   try {
     await apiFetchData(`room/${roomId}`, 'PUT', {
       action: 'click-word',
-      username: getUsernameStore(),
+      username: props.user?.name,
       wordname: word.wordName
     })
   } catch (error) {
@@ -43,13 +34,13 @@ const clickWord = async (word: Word) => {
 }
 
 const selectWord = async (word: Word) => {
-  if (isUserSpy.value) return
+  if (isUserSpy()) return
   if (!isUserTeamTurn.value) return
-  const roomId = props.room?.id
+  const roomId = props.room.id
   try {
     await apiFetchData(`room/${roomId}`, 'PUT', {
       action: 'select-word',
-      username: getUsernameStore(),
+      username: props.user?.name,
       wordname: word.wordName
     })
   } catch (error) {
@@ -61,20 +52,20 @@ const selectWord = async (word: Word) => {
 <template>
   <div class="center">
     <div class="grid grid-cols-5 gap-y-1 gap-x-2">
-      <div v-for="(word, i) in room?.words" :key="i">
+      <div v-for="(word, i) in room.words" :key="i">
         <div
           class="card-image relative"
           :class="{
-            red: word.wordColor === 'RED' && isUserSpy,
-            white: !isUserSpy || (word.wordColor === 'WHITE' && isUserSpy),
-            blue: word.wordColor === 'BLUE' && isUserSpy,
-            black: word.wordColor === 'BLACK' && isUserSpy
+            red: word.wordColor === 'RED' && isUserSpy(),
+            white: !isUserSpy() || (word.wordColor === 'WHITE' && isUserSpy()),
+            blue: word.wordColor === 'BLUE' && isUserSpy(),
+            black: word.wordColor === 'BLACK' && isUserSpy()
           }"
           @click="selectWord(word)"
         >
           <div
             class="font-fira flex justify-center items-end uppercase whitespace-nowrap break-all font-bold text-3xl h-full pb-5"
-            :class="word.wordColor === 'BLACK' && isUserSpy ? 'text-white' : 'text-black'"
+            :class="word.wordColor === 'BLACK' && isUserSpy() ? 'text-white' : 'text-black'"
           >
             {{ word.wordName }}
           </div>
@@ -83,8 +74,8 @@ const selectWord = async (word: Word) => {
               <div
                 class="inline-block rounded-sm p-px px-1 mr-0.5 mb-0.5 text-white truncate text-xxs leading-none landscape:text-sm"
                 :class="{
-                  'bg-blue-team-bg': room?.teamTurn === 'BLUE',
-                  'bg-red-team-bg': room?.teamTurn === 'RED'
+                  'bg-blue-team-bg': room.teamTurn === 'BLUE',
+                  'bg-red-team-bg': room.teamTurn === 'RED'
                 }"
               >
                 {{ player }}
@@ -118,6 +109,7 @@ const selectWord = async (word: Word) => {
 }
 
 .click-button {
+  z-index: 50;
   right: -4.2px;
   top: -2.1px;
   width: 49px;
@@ -152,3 +144,4 @@ const selectWord = async (word: Word) => {
   background-position-y: 0%;
 }
 </style>
+@/stores/userStore @/stores/user

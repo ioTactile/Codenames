@@ -1,19 +1,12 @@
 <script setup lang="ts">
-import type { Room } from '@/types/types'
+import type { Room, Player } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
 import { computed } from 'vue'
-import { useRoomUserStore } from '@/stores/roomUser'
 
 const props = defineProps<{
-  room: Room | null
+  room: Room
+  user: Player | null
 }>()
-
-const roomUserStore = useRoomUserStore()
-
-const getUsernameStore = () => {
-  if (!props.room) return null
-  return roomUserStore.getRoomUser(props.room!.id)?.username
-}
 
 const blueAgents = computed(() => {
   if (!props.room) return []
@@ -34,29 +27,13 @@ const nonePlayers = computed(() => {
   return props.room.players.filter((player) => player.playerTeam === 'NONE')
 })
 
-const isInTeamBlue = () => {
-  if (!props.room) return false
-  const usernameStore = getUsernameStore()
-  return !!props.room.players.some(
-    (player) => player.playerTeam === 'BLUE' && player.name === usernameStore
-  )
-}
-
-const isInTeamRed = () => {
-  if (!props.room) return false
-  const usernameStore = getUsernameStore()
-  return !!props.room.players.some(
-    (player) => player.playerTeam === 'RED' && player.name === usernameStore
-  )
-}
-
 const joinRole = async (role: string) => {
-  if (isInTeamRed()) return
+  if (props.user?.playerTeam === 'RED') return
   try {
-    const roomId = props.room?.id
+    const roomId = props.room.id
     await apiFetchData(`room/${roomId}`, 'PUT', {
       action: 'select-role',
-      username: roomUserStore.getRoomUser(roomId!)?.username,
+      username: props.user?.name,
       role,
       team: 'BLUE'
     })
@@ -74,7 +51,7 @@ const joinRole = async (role: string) => {
       <section class="relative h-12 landscape:h-28">
         <span
           class="score w-12 text-center absolute text-white top-6 landscape:top-14 left-[20px]"
-          >{{ room?.blueRemainingWords || '-' }}</span
+          >{{ room.blueRemainingWords || '-' }}</span
         >
       </section>
       <section>
@@ -89,7 +66,13 @@ const joinRole = async (role: string) => {
           </div>
         </div>
         <div v-else class="pl-2 text-white">–</div>
-        <button v-if="nonePlayers.length" class="button" @click="joinRole('OPERATIVE')">
+        <button
+          v-if="
+            nonePlayers.length && (user?.playerTeam === 'BLUE' || user?.playerRole === 'OPERATIVE')
+          "
+          class="button shadow-bottom text-base"
+          @click="joinRole('OPERATIVE')"
+        >
           Rejoindre en tant qu'agent
         </button>
       </section>
@@ -106,8 +89,10 @@ const joinRole = async (role: string) => {
         </div>
         <div v-else class="pl-2 text-white">–</div>
         <button
-          v-if="!blueSpymaster.length && isInTeamBlue()"
-          class="button"
+          v-if="
+            !blueSpymaster.length && (user?.playerTeam === 'BLUE' || user?.playerTeam === 'NONE')
+          "
+          class="button shadow-bottom text-base"
           @click="joinRole('SPYMASTER')"
         >
           Rejoindre en tant qu'espion
@@ -134,3 +119,4 @@ const joinRole = async (role: string) => {
   transform-origin: 50% 50% 0px;
 }
 </style>
+@/stores/userStore

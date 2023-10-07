@@ -3,13 +3,10 @@ import type { Room } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
 
 const props = defineProps<{
-  room: Room | null
-  isHost: boolean
+  room: Room
 }>()
 
 const startRoom = async () => {
-  if (!props.room) return
-  if (!props.isHost) return
   const roomId = props.room.id
   try {
     await apiFetchData(`room/${roomId}`, 'PUT', {

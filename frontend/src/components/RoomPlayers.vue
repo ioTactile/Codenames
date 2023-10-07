@@ -88,6 +88,6 @@ const resetPlayers = async () => {
   position: absolute;
   width: 380px;
   inset: 0px auto auto 0px;
-  transform: translateX(-10px) translateY(45px);
+  transform: translateX(-10px) translateY(45px) translateZ(0px);
 }
 </style>

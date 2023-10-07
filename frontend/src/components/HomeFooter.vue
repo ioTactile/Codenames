@@ -1,7 +1,3 @@
-<script setup lang="ts">
-import SocialMedia from '@/components/SocialMedia.vue'
-</script>
-
 <template>
   <footer class="bg-black py-10">
     <div class="flex flex-col mx-auto text-white justify-center xl:flex-row xl:justify-around">

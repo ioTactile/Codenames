@@ -1,14 +1,12 @@
 <script setup lang="ts">
-import type { Room } from '@/types/types'
-import { useRoomUserStore } from '@/stores/roomUser'
+import type { Player, Room } from '@/types/types'
 import { computed, ref, watch } from 'vue'
 import { apiFetchData } from '@/utils/api'
 
 const props = defineProps<{
-  room: Room | null
+  room: Room
+  user: Player | null
 }>()
-
-const roomUserStore = useRoomUserStore()
 
 const isClueModalOpen = ref<boolean>(false)
 const clueNumber = ref<number>(0)
@@ -17,34 +15,30 @@ const clueOptions = ref<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 const showClue = ref<boolean>(false)
 
 const isUserSpyTurn = computed(() => {
-  const userStore = roomUserStore.getRoomUser(props.room!.id)?.username
-  const user = props.room?.players.find((player) => player.name === userStore)
   return !!(
-    user?.playerRole === 'SPYMASTER' &&
-    user?.playerTeam === props.room?.teamTurn &&
-    props.room?.roleTurn === 'SPYMASTER' &&
-    props.room?.status === 'IN_PROGRESS'
+    props.user?.playerRole === 'SPYMASTER' &&
+    props.user?.playerTeam === props.room.teamTurn &&
+    props.room.roleTurn === 'SPYMASTER' &&
+    props.room.status === 'IN_PROGRESS'
   )
 })
 
 const isUserOperativeTurn = computed(() => {
-  const userStore = roomUserStore.getRoomUser(props.room!.id)?.username
-  const user = props.room?.players.find((player) => player.name === userStore)
   return !!(
-    user?.playerRole === 'OPERATIVE' &&
-    user?.playerTeam === props.room?.teamTurn &&
-    props.room?.roleTurn === 'OPERATIVE' &&
-    props.room?.status === 'IN_PROGRESS'
+    props.user?.playerRole === 'OPERATIVE' &&
+    props.user?.playerTeam === props.room.teamTurn &&
+    props.room.roleTurn === 'OPERATIVE' &&
+    props.room.status === 'IN_PROGRESS'
   )
 })
 
 const getLastClue = computed(() => {
-  const lastClue = props.room?.clues[props.room?.clues.length - 1]
+  const lastClue = props.room.clues[props.room.clues.length - 1]
   return lastClue
 })
 
 const getRoleTurn = () => {
-  if (props.room?.roleTurn === 'OPERATIVE') {
+  if (props.room.roleTurn === 'OPERATIVE') {
     showClue.value = true
   } else {
     showClue.value = false
@@ -52,7 +46,7 @@ const getRoleTurn = () => {
 }
 
 watch(
-  () => props.room?.roleTurn,
+  () => props.room.roleTurn,
   () => {
     getRoleTurn()
   }
@@ -62,7 +56,7 @@ const sendClue = async () => {
   if (!isUserSpyTurn.value) return
   if (!clueName.value) return
   if (!clueNumber.value) return
-  const roomId = props.room?.id
+  const roomId = props.room.id
   if (!roomId) return
 
   try {
@@ -72,9 +66,9 @@ const sendClue = async () => {
         clueName: clueName.value,
         attempts: clueNumber.value,
         remaining: clueNumber.value + 1,
-        spyName: roomUserStore.getRoomUser(roomId)?.username
+        spyName: props.user?.name
       },
-      username: roomUserStore.getRoomUser(roomId)?.username
+      username: props.user?.name
     })
   } catch (error) {
     console.error('Error:', error)
@@ -83,7 +77,7 @@ const sendClue = async () => {
 
 const teamTurn = async () => {
   if (!isUserOperativeTurn.value) return
-  const roomId = props.room?.id
+  const roomId = props.room.id
   if (!roomId) return
 
   try {
@@ -146,15 +140,15 @@ const teamTurn = async () => {
       </div>
     </div>
   </template>
-  <template v-if="room?.roleTurn === 'OPERATIVE'">
+  <template v-if="room.roleTurn === 'OPERATIVE'">
     <div class="bottom">
       <div class="w-full flex flex-col justify-center items-center text-xl landscape:text-3xl">
         <Transition name="slide-fade">
           <div class="flex justify-center items-center">
             <span
               :class="{
-                'ring-blue-light': props.room?.teamTurn === 'BLUE',
-                'ring-red-light': props.room?.teamTurn === 'RED'
+                'ring-blue-light': props.room.teamTurn === 'BLUE',
+                'ring-red-light': props.room.teamTurn === 'RED'
               }"
               class="bg-white rounded-lg uppercase font-bold select-text ml-1 px-3 py-1 ring-4 landscape:px-4 landscape:py-2 landscape:ml-2 landscape:ring-8"
             >
@@ -162,8 +156,8 @@ const teamTurn = async () => {
             </span>
             <span
               :class="{
-                'ring-blue-light': props.room?.teamTurn === 'BLUE',
-                'ring-red-light': props.room?.teamTurn === 'RED'
+                'ring-blue-light': props.room.teamTurn === 'BLUE',
+                'ring-red-light': props.room.teamTurn === 'RED'
               }"
               class="bg-white rounded-lg uppercase font-bold select-text ml-1 px-3 py-1 ring-4 landscape:px-4 landscape:py-2 landscape:ml-2 landscape:ring-8"
             >
@@ -217,3 +211,4 @@ const teamTurn = async () => {
   }
 }
 </style>
+@/stores/userStore @/stores/user

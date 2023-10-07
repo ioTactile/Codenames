@@ -33,7 +33,7 @@ export type Clue = {
   spyName: string
 }
 
-export type RoomUser = {
+export type User = {
   roomId: number
   username: string
 }

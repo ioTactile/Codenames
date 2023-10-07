@@ -1,24 +1,20 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import type { Room } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
-import { useRoomUserStore } from '@/stores/roomUser'
+import { useUserStore } from '@/stores/user'
 import Newsletter from '@/components/HomeNewsletter.vue'
 
 const props = defineProps<{
   location: string
 }>()
 
-const emits = defineEmits<{
-  (e: 'join', value: boolean): void
-}>()
-
 const username = ref<string>('')
 const router = useRouter()
 const route = useRoute()
 
-const roomUserStore = useRoomUserStore()
+const userStore = useUserStore()
 
 const joinRoom = async () => {
   if (!username.value) {
@@ -29,7 +25,7 @@ const joinRoom = async () => {
   try {
     if (props.location === 'create') {
       const data: Room = await apiFetchData('room/create', 'POST', { username: username.value })
-      roomUserStore.setRoomUser(data.id, username.value)
+      userStore.setUser(data.id, username.value)
       router.push({ name: 'room-details', params: { id: data.id } })
     } else if (props.location === 'join') {
       const roomId = Number(route.params.id)
@@ -37,18 +33,14 @@ const joinRoom = async () => {
         action: 'join',
         username: username.value
       })
-      roomUserStore.setRoomUser(roomId, username.value)
-      console.log('roomUserStore', roomUserStore.getRoomUser(roomId))
-      emits('join', true)
+      userStore.setUser(roomId, username.value)
     }
   } catch (error) {
     console.error('Error:', error)
+  } finally {
+    username.value = ''
   }
 }
-
-const buttonLabel = computed(() => {
-  return props.location === 'create' ? 'Créer un salon' : 'Rejoindre le salon'
-})
 </script>
 
 <template>
@@ -70,7 +62,7 @@ const buttonLabel = computed(() => {
         />
       </div>
       <button @click="joinRoom" class="button shadow-xl rounded-2xl border-2 text-base">
-        {{ buttonLabel }}
+        {{ location === 'create' ? 'Créer un salon' : 'Rejoindre le salon' }}
       </button>
     </section>
     <Newsletter location="create" />
@@ -84,3 +76,4 @@ const buttonLabel = computed(() => {
   border-color: rgb(255, 246, 167) rgb(255, 228, 0) rgb(243, 187, 0);
 }
 </style>
+@/stores/userStore @/stores/user

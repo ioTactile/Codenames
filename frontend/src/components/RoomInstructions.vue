@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { useRoomUserStore } from '@/stores/roomUser'
-import type { Room } from '@/types/types'
+import type { Room, Player } from '@/types/types'
 import { computed } from 'vue'
 
-const roomUserStore = useRoomUserStore()
-
 const props = defineProps<{
-  room: Room | null
+  room: Room
   isHost: boolean
+  user: Player | null
 }>()
 
 const getInstructions = computed(() => {
-  switch (props.room?.status) {
+  switch (props.room.status) {
     case 'PENDING':
       if (props.isHost) {
         return 'Configurer la partie :'
@@ -19,15 +17,15 @@ const getInstructions = computed(() => {
         return "Choisissez votre rôle et attendez que l'hôte configure la partie."
       }
     case 'IN_PROGRESS':
-      switch (props.room?.teamTurn) {
+      switch (props.room.teamTurn) {
         case 'RED':
-          if (props.room?.roleTurn === 'SPYMASTER') {
+          if (props.room.roleTurn === 'SPYMASTER') {
             return "L'espion rouge est en train de jouer."
           } else {
             return 'Les agents rouges sont en train de jouer.'
           }
         case 'BLUE':
-          if (props.room?.roleTurn === 'SPYMASTER') {
+          if (props.room.roleTurn === 'SPYMASTER') {
             return "L'espion bleu est en train de jouer."
           } else {
             return 'Les agents bleus sont en train de jouer.'
@@ -45,13 +43,7 @@ const getInstructions = computed(() => {
 })
 
 const getSupp = computed(() => {
-  if (
-    props.room?.players.some(
-      (player) =>
-        player.name === roomUserStore.getRoomUser(props.room!.id)?.username &&
-        player.playerTeam === 'NONE'
-    )
-  ) {
+  if (props.user?.playerRole === 'NONE') {
     return ' (Pour jouer, vous devez rejoindre une équipe.)'
   } else {
     return ''

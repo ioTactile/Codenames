@@ -1,23 +1,19 @@
 <script setup lang="ts">
 import type { Player } from '@/types/types'
-import { useRoomUserStore } from '@/stores/roomUser'
+import { useUserStore } from '@/stores/user'
 import { onMounted, ref, watch } from 'vue'
 import { apiFetchData } from '@/utils/api'
 import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   id: number
-  player: Player | null | undefined
+  player: Player | null
 }>()
 
 const router = useRouter()
 
-const getRoomUser = () => {
-  return roomUserStore.getRoomUser(props.id)?.username
-}
-
-const roomUserStore = useRoomUserStore()
-const username = ref<string>(getRoomUser() || '')
+const userStore = useUserStore()
+const username = ref<string>(props.player?.name || '')
 const isURLHidden = ref<boolean>(false)
 
 onMounted(() => {
@@ -43,10 +39,6 @@ watch(isURLHidden, (value) => {
 })
 
 const changeUsername = async () => {
-  if (!getRoomUser()) {
-    alert("Vous n'êtes pas dans ce salon")
-    router.push({ name: 'home' })
-  }
   if (!username.value) {
     alert('Veuillez choisir un pseudo')
     return
@@ -55,10 +47,10 @@ const changeUsername = async () => {
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', {
       action: 'change-username',
-      username: getRoomUser(),
+      username: props.player?.name,
       newUsername: username.value
     })
-    roomUserStore.setRoomUser(props.id, username.value)
+    userStore.setUser(props.id, username.value)
   } catch (error) {
     console.error('Error:', error)
   }
@@ -68,9 +60,9 @@ const leaveRoom = async () => {
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', {
       action: 'leave',
-      username: getRoomUser()
+      username: props.player?.name
     })
-    roomUserStore.removeRoomUser(props.id, username.value)
+    userStore.removeUser(props.id, username.value)
     router.push({ name: 'home' })
   } catch (error) {
     console.error('Error:', error)
@@ -151,7 +143,7 @@ const leaveRoom = async () => {
   position: absolute;
   width: 360px;
   inset: 0px auto auto 0px;
-  transform: translateX(-265px) translateY(45px) translateZ(0px);
+  transform: translateX(-245px) translateY(45px) translateZ(0px);
 }
 
 .switch {
@@ -213,3 +205,4 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 </style>
+@/stores/userStore @/stores/roomUser
