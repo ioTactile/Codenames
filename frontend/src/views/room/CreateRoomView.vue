@@ -3,9 +3,9 @@ import Join from '@/components/RoomJoin.vue'
 </script>
 
 <template>
-  <main class="flex justify-center items-center h-screen px-2">
+  <main class="flex h-screen items-center justify-center px-2">
     <div class="first-layer absolute inset-0 transition-all"></div>
-    <div class="second-layer bg-cover absolute inset-0"></div>
+    <div class="second-layer absolute inset-0 bg-cover"></div>
     <Join location="create" />
   </main>
 </template>

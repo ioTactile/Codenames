@@ -92,10 +92,10 @@ const teamTurn = async () => {
 
 <template>
   <template v-if="isUserSpyTurn">
-    <div class="absolute top-[860px] w-full z-70">
-      <div class="w-full flex justify-end landscape:justify-center">
+    <div class="z-70 absolute top-[860px] w-full">
+      <div class="flex w-full justify-end landscape:justify-center">
         <div
-          class="max-w-screen-md flex items-center justify-center flex-wrap w-10/12 landscape:w-full"
+          class="flex w-10/12 max-w-screen-md flex-wrap items-center justify-center landscape:w-full"
         >
           <div class="flex-grow">
             <input
@@ -106,22 +106,22 @@ const teamTurn = async () => {
               tabindex="0"
               placeholder="Tapez votre indice ici"
               @input="clueName = clueName.toUpperCase()"
-              class="w-full text-2xl px-3 rounded-xl shadow-bottom focus:outline-none text-black border-none h-10"
+              class="h-10 w-full rounded-xl border-none px-3 text-2xl text-black shadow-bottom focus:outline-none"
             />
           </div>
           <div class="mx-2 flex-none">
             <div class="relative">
               <div
-                class="flex justify-center items-center bg-white rounded-lg shadow-bottom border-ui w-10 h-10 text-2xl cursor-pointer"
+                class="border-ui flex h-10 w-10 cursor-pointer items-center justify-center rounded-lg bg-white text-2xl shadow-bottom"
                 @click="isClueModalOpen = !isClueModalOpen"
               >
                 {{ clueNumber || '–' }}
               </div>
               <div v-if="isClueModalOpen" class="clue-number-modal absolute z-50">
-                <div class="flex p-2 bg-white rounded-lg shadow-bottom border-ui">
+                <div class="border-ui flex rounded-lg bg-white p-2 shadow-bottom">
                   <div v-for="number in clueOptions" :key="number">
                     <div
-                      class="clue-number-option hover:bg-yellow text-2xl rounded-lg leading-6 inline-block cursor-pointer"
+                      class="clue-number-option inline-block cursor-pointer rounded-lg text-2xl leading-6 hover:bg-yellow"
                       @click="(clueNumber = number), (isClueModalOpen = false)"
                     >
                       {{ number }}
@@ -132,7 +132,7 @@ const teamTurn = async () => {
             </div>
           </div>
           <div class="relative flex-initial">
-            <button class="button color-green shadow-bottom text-2xl" @click="sendClue">
+            <button class="button color-green text-2xl shadow-bottom" @click="sendClue">
               Donner un indice
             </button>
           </div>
@@ -142,15 +142,15 @@ const teamTurn = async () => {
   </template>
   <template v-if="room.roleTurn === 'OPERATIVE'">
     <div class="bottom">
-      <div class="w-full flex flex-col justify-center items-center text-xl landscape:text-3xl">
+      <div class="flex w-full flex-col items-center justify-center text-xl landscape:text-3xl">
         <Transition name="slide-fade">
-          <div class="flex justify-center items-center">
+          <div class="flex items-center justify-center">
             <span
               :class="{
                 'ring-blue-light': props.room.teamTurn === 'BLUE',
                 'ring-red-light': props.room.teamTurn === 'RED'
               }"
-              class="bg-white rounded-lg uppercase font-bold select-text ml-1 px-3 py-1 ring-4 landscape:px-4 landscape:py-2 landscape:ml-2 landscape:ring-8"
+              class="ml-1 select-text rounded-lg bg-white px-3 py-1 font-bold uppercase ring-4 landscape:ml-2 landscape:px-4 landscape:py-2 landscape:ring-8"
             >
               {{ getLastClue?.clueName }}
             </span>
@@ -159,7 +159,7 @@ const teamTurn = async () => {
                 'ring-blue-light': props.room.teamTurn === 'BLUE',
                 'ring-red-light': props.room.teamTurn === 'RED'
               }"
-              class="bg-white rounded-lg uppercase font-bold select-text ml-1 px-3 py-1 ring-4 landscape:px-4 landscape:py-2 landscape:ml-2 landscape:ring-8"
+              class="ml-1 select-text rounded-lg bg-white px-3 py-1 font-bold uppercase ring-4 landscape:ml-2 landscape:px-4 landscape:py-2 landscape:ring-8"
             >
               {{ getLastClue?.attempts }}
             </span>

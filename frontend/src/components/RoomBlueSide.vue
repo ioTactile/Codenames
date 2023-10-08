@@ -45,22 +45,22 @@ const joinRole = async (role: string) => {
 
 <template>
   <div
-    class="flex-1 landscape:flex-none landscape:rounded-xl landscape:border-ui landscape:shadow-bottom bg-blue-team-bg"
+    class="landscape:border-ui flex-1 bg-blue-team-bg landscape:flex-none landscape:rounded-xl landscape:shadow-bottom"
   >
-    <div class="w-full p-2 box-border">
+    <div class="box-border w-full p-2">
       <section class="relative h-12 landscape:h-28">
         <span
-          class="score w-12 text-center absolute text-white top-6 landscape:top-14 left-[20px]"
+          class="score absolute left-[20px] top-6 w-12 text-center text-white landscape:top-14"
           >{{ room.blueRemainingWords || '-' }}</span
         >
       </section>
       <section>
-        <span class="mt-1 text-base w-full relative text-blue-light">Agents</span>
-        <div v-if="blueAgents.length" class="flex justify-start items-start flex-wrap">
+        <span class="relative mt-1 w-full text-base text-blue-light">Agents</span>
+        <div v-if="blueAgents.length" class="flex flex-wrap items-start justify-start">
           <div
             v-for="(user, i) in blueAgents"
             :key="i"
-            class="user-wrapper inline-block py-1 px-1 mr-1 mb-1 truncate text-white border border-white/40 rounded leading-none font-bold"
+            class="user-wrapper mb-1 mr-1 inline-block truncate rounded border border-white/40 px-1 py-1 font-bold leading-none text-white"
           >
             {{ user.name }}
           </div>
@@ -70,19 +70,19 @@ const joinRole = async (role: string) => {
           v-if="
             nonePlayers.length && (user?.playerTeam === 'BLUE' || user?.playerRole === 'OPERATIVE')
           "
-          class="button shadow-bottom text-base"
+          class="button text-base shadow-bottom"
           @click="joinRole('OPERATIVE')"
         >
           Rejoindre en tant qu'agent
         </button>
       </section>
       <section>
-        <span class="mt-1 text-base w-full relative text-blue-light">Espions</span>
-        <div v-if="blueSpymaster.length" class="flex justify-start items-start flex-wrap">
+        <span class="relative mt-1 w-full text-base text-blue-light">Espions</span>
+        <div v-if="blueSpymaster.length" class="flex flex-wrap items-start justify-start">
           <div
             v-for="(user, i) in blueSpymaster"
             :key="i"
-            class="user-wrapper inline-block py-1 px-1 mr-1 mb-1 truncate text-white border border-white/40 rounded leading-none font-bold"
+            class="user-wrapper mb-1 mr-1 inline-block truncate rounded border border-white/40 px-1 py-1 font-bold leading-none text-white"
           >
             {{ user.name }}
           </div>
@@ -92,7 +92,7 @@ const joinRole = async (role: string) => {
           v-if="
             !blueSpymaster.length && (user?.playerTeam === 'BLUE' || user?.playerTeam === 'NONE')
           "
-          class="button shadow-bottom text-base"
+          class="button text-base shadow-bottom"
           @click="joinRole('SPYMASTER')"
         >
           Rejoindre en tant qu'espion

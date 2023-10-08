@@ -76,11 +76,11 @@ body {
 
 @layer components {
   .border-ui {
-    @apply border border-solid border-opacity-30 border-black;
+    @apply border border-solid border-black border-opacity-30;
   }
 
   .tutorial {
-    @apply bg-tutorial border-t-8 border-tutorial z-10 w-full pb-8 pt-3 px-6;
+    @apply z-10 w-full border-t-8 border-tutorial bg-tutorial px-6 pb-8 pt-3;
   }
 
   .tutorial b {
@@ -88,15 +88,15 @@ body {
   }
 
   .create-button-wrapper {
-    @apply bg-gradient-to-br from-border-yellow via-yellow to-border-orange rounded-20px shadow-sharp inline-block;
+    @apply inline-block rounded-20px bg-gradient-to-br from-border-yellow via-yellow to-border-orange shadow-sharp;
   }
 
   .create-button {
-    @apply bg-gradient-to-br from-yellow to-orange text-black text-vw py-2 px-3 rounded-20px text-center font-black;
+    @apply rounded-20px bg-gradient-to-br from-yellow to-orange px-3 py-2 text-center text-vw font-black text-black;
   }
 
   .close-button {
-    @apply flex items-center justify-center text-xxs absolute rounded-full top-0 right-0 text-black mr-6 mt-2 w-4 h-4;
+    @apply text-xxs absolute right-0 top-0 mr-6 mt-2 flex h-4 w-4 items-center justify-center rounded-full text-black;
   }
 
   @screen sm {
@@ -107,7 +107,7 @@ body {
 
   @screen md {
     .tutorial {
-      @apply p-8 pt-5 w-500px rounded-20px border-0 bg-transparent bg-gradient-to-b from-tutorial-desktop to-transparent;
+      @apply w-500px rounded-20px border-0 bg-transparent bg-gradient-to-b from-tutorial-desktop to-transparent p-8 pt-5;
     }
   }
 }

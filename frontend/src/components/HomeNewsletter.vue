@@ -17,7 +17,7 @@ const subscribe = () => {
 
 <template>
   <section
-    class="flex flex-col sm:flex-row justify-center content-between text-white"
+    class="flex flex-col content-between justify-center text-white sm:flex-row"
     :class="{
       'bg-darkPurple': location === 'home',
       'bg-gray-200': location === 'create'
@@ -28,7 +28,7 @@ const subscribe = () => {
         <div class="flex flex-col items-center">
           <label
             for="email"
-            class="font-bold mb-2 text-center"
+            class="mb-2 text-center font-bold"
             :class="{
               'text-white': location === 'home',
               'text-black': location === 'create'
@@ -41,12 +41,12 @@ const subscribe = () => {
             type="email"
             v-model.trim="email"
             placeholder="Saisissez votre email"
-            class="text-center text-base rounded-xl border-gray-500 shadow-inset w-3/4 p-2 text-black"
+            class="w-3/4 rounded-xl border-gray-500 p-2 text-center text-base text-black shadow-inset"
           />
         </div>
         <button
           type="submit"
-          class="px-6 py-2 mt-2 rounded-xl border-2 text-white bg-purple hover:bg-darkPurple"
+          class="mt-2 rounded-xl border-2 bg-purple px-6 py-2 text-white hover:bg-darkPurple"
           :class="{
             'border-white': location === 'home'
           }"
@@ -54,7 +54,7 @@ const subscribe = () => {
           S'inscrire
         </button>
         <p
-          class="text-sm mt-4 px-2 text-center"
+          class="mt-4 px-2 text-center text-sm"
           :class="{
             'text-white': location === 'home',
             'text-black': location === 'create'

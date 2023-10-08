@@ -19,7 +19,10 @@ const isUserSpy = () => {
 }
 
 const clickWord = async (word: Word) => {
-  if (isUserSpy()) return
+  if (isUserSpy()) {
+    alert("Vous êtes l'espion, vous ne pouvez pas cliquer sur les mots !")
+    return
+  }
   if (!isUserTeamTurn.value) return
   const roomId = props.room.id
   try {
@@ -34,7 +37,10 @@ const clickWord = async (word: Word) => {
 }
 
 const selectWord = async (word: Word) => {
-  if (isUserSpy()) return
+  if (isUserSpy()) {
+    alert("Vous êtes l'espion, vous ne pouvez pas cliquer sur les mots !")
+    return
+  }
   if (!isUserTeamTurn.value) return
   const roomId = props.room.id
   try {
@@ -51,7 +57,7 @@ const selectWord = async (word: Word) => {
 
 <template>
   <div class="center">
-    <div class="grid grid-cols-5 gap-y-1 gap-x-2">
+    <div class="grid grid-cols-5 gap-x-2 gap-y-1">
       <div v-for="(word, i) in room.words" :key="i">
         <div
           class="card-image relative"
@@ -64,7 +70,7 @@ const selectWord = async (word: Word) => {
           @click="selectWord(word)"
         >
           <div
-            class="font-fira flex justify-center items-end uppercase whitespace-nowrap break-all font-bold text-3xl h-full pb-5"
+            class="flex h-full items-end justify-center whitespace-nowrap break-all pb-5 font-fira text-3xl font-bold uppercase"
             :class="word.wordColor === 'BLACK' && isUserSpy() ? 'text-white' : 'text-black'"
           >
             {{ word.wordName }}
@@ -72,7 +78,7 @@ const selectWord = async (word: Word) => {
           <div v-for="(player, i) in word.selectedBy" :key="i">
             <div class="tips-wrapper absolute flex flex-wrap">
               <div
-                class="inline-block rounded-sm p-px px-1 mr-0.5 mb-0.5 text-white truncate text-xxs leading-none landscape:text-sm"
+                class="text-xxs mb-0.5 mr-0.5 inline-block truncate rounded-sm p-px px-1 leading-none text-white landscape:text-sm"
                 :class="{
                   'bg-blue-team-bg': room.teamTurn === 'BLUE',
                   'bg-red-team-bg': room.teamTurn === 'RED'
@@ -83,8 +89,8 @@ const selectWord = async (word: Word) => {
             </div>
           </div>
           <button
-            @click="clickWord(word)"
-            class="click-button absolute shadow-bottom bg-yellow rounded-full pointer-events-auto"
+            @click.stop="clickWord(word)"
+            class="click-button pointer-events-auto absolute z-50 rounded-full bg-yellow shadow-bottom"
           ></button>
         </div>
       </div>
@@ -109,7 +115,6 @@ const selectWord = async (word: Word) => {
 }
 
 .click-button {
-  z-index: 50;
   right: -4.2px;
   top: -2.1px;
   width: 49px;

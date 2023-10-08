@@ -27,28 +27,28 @@ const togglePlayerMenu = () => {
 </script>
 
 <template>
-  <nav class="flex justify-between m-1 px-2">
+  <nav class="m-1 flex justify-between px-2">
     <div class="flex">
       <div class="relative">
         <button @click="togglePlayersMenu" class="button shadow-bottom">
           <div class="flex items-center justify-center">
             <span>Joueurs :</span>
-            <img src="/images/icon_player.png" alt="Icon player" class="h-4 mr-1 landscape:ml-2" />
+            <img src="/images/icon_player.png" alt="Icon player" class="mr-1 h-4 landscape:ml-2" />
             <span>{{ room?.players.length }}</span>
           </div>
         </button>
-        <Players v-if="isPlayersMenuOpen" :players="room.players" :id="room.id" :is-host="isHost" />
+        <Players v-if="isPlayersMenuOpen" :users="room.players" :id="room.id" :is-host="isHost" />
       </div>
       <button
         v-if="isHost"
-        class="button-circle flex ml-2 justify-center items-center shadow-bottom"
+        class="button-circle ml-2 flex items-center justify-center shadow-bottom"
         @click="emit('openTimerMenu', true)"
       >
-        <img src="/images/timer.png" alt="Timer icon" class="w-3/4 pointer-events-none" />
+        <img src="/images/timer.png" alt="Timer icon" class="pointer-events-none w-3/4" />
       </button>
     </div>
     <div class="flex">
-      <button class="button shadow-bottom mx-2">Règles</button>
+      <button class="button mx-2 shadow-bottom">Règles</button>
       <div class="relative">
         <button
           class="button shadow-bottom"
@@ -60,11 +60,11 @@ const togglePlayerMenu = () => {
           @click="togglePlayerMenu"
         >
           <div class="relative">
-            <span class="mr-7 portrait:max-w-[100px] truncate">
+            <span class="mr-7 truncate portrait:max-w-[100px]">
               {{ user?.name || 'Non défini' }}
             </span>
             <svg
-              class="absolute text-gray-700 transform -translate-y-1/2 fill-current w-5 h-5 -right-1 top-2.5 dark:text-dark-text"
+              class="dark:text-dark-text absolute -right-1 top-3 h-5 w-5 -translate-y-1/2 transform fill-current text-gray-700"
               xmlns="http://www.w3.org/2000/svg"
               viewbox="0 0 22 22"
             >
@@ -75,7 +75,7 @@ const togglePlayerMenu = () => {
             </svg>
           </div>
         </button>
-        <Player v-if="isPlayerMenuOpen" :player="user" :id="room.id" />
+        <Player v-if="isPlayerMenuOpen" :id="room.id" :status="room.status" :user="user" />
       </div>
     </div>
   </nav>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Player } from '@/types/types'
+import type { Player, Room } from '@/types/types'
 import { useUserStore } from '@/stores/user'
 import { onMounted, ref, watch } from 'vue'
 import { apiFetchData } from '@/utils/api'
@@ -7,13 +7,14 @@ import { useRouter } from 'vue-router'
 
 const props = defineProps<{
   id: number
-  player: Player | null
+  status: Room['status']
+  user: Player | null
 }>()
 
 const router = useRouter()
 
 const userStore = useUserStore()
-const username = ref<string>(props.player?.name || '')
+const username = ref<string>(props.user?.name || '')
 const isURLHidden = ref<boolean>(false)
 
 onMounted(() => {
@@ -47,7 +48,7 @@ const changeUsername = async () => {
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', {
       action: 'change-username',
-      username: props.player?.name,
+      username: props.user?.name,
       newUsername: username.value
     })
     userStore.setUser(props.id, username.value)
@@ -57,13 +58,28 @@ const changeUsername = async () => {
 }
 
 const leaveRoom = async () => {
+  if (props.status !== 'PENDING') return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', {
       action: 'leave',
-      username: props.player?.name
+      username: props.user?.name
     })
     userStore.removeUser(props.id, username.value)
     router.push({ name: 'home' })
+  } catch (error) {
+    console.error('Error:', error)
+  }
+}
+
+const selectTeam = async (team: string) => {
+  if (props.status !== 'PENDING') return
+  if (props.user?.playerTeam === 'NONE') return
+  try {
+    await apiFetchData(`room/${props.id}`, 'PUT', {
+      action: 'select-team',
+      username: props.user?.name,
+      team
+    })
   } catch (error) {
     console.error('Error:', error)
   }
@@ -72,13 +88,57 @@ const leaveRoom = async () => {
 
 <template>
   <div class="menu-wrapper">
-    <div class="rounded-xl bg-white shadow-bottom border-ui">
-      <div class="flex flex-col items-center justify-center p-4">
-        <h3 class="my-2 text-xl text-center">Rejoignez une équipe !</h3>
-      </div>
-      <hr class="border-gray-300" />
-      <div class="py-4 px-2 bg-gray-200">
-        <div class="text-center px-2">
+    <div class="border-ui rounded-xl bg-white shadow-bottom">
+      <template v-if="status === 'PENDING'">
+        <div class="flex flex-col items-center justify-center p-4">
+          <h3 v-if="user?.playerTeam === 'NONE'" class="my-2 text-center text-xl">
+            Rejoignez une équipe !
+          </h3>
+          <template v-else>
+            <button
+              class="button-wrapper button shadow-button color-beige text-base"
+              @click="selectTeam('NONE')"
+            >
+              <img src="/images/icon_spectator.png" alt="Spectator icon" class="h-7 w-7" />
+              <div class="ml-1">Devenir spectateur</div>
+            </button>
+            <div class="mt-2">
+              <button
+                v-if="user?.playerTeam === 'BLUE'"
+                class="button-wrapper button shadow-button color-red text-base"
+                @click="selectTeam('RED')"
+              >
+                <img
+                  src="/images/icon_red_operative.png"
+                  alt="Red operative icon"
+                  class="h-7 w-7"
+                />
+                <div class="ml-1">Passer dans l'équipe rouge</div>
+              </button>
+              <button
+                v-else-if="user?.playerTeam === 'RED'"
+                class="button-wrapper button shadow-button color-blue text-base"
+                @click="selectTeam('BLUE')"
+              >
+                <img
+                  src="/images/icon_blue_operative.png"
+                  alt="Blue operative icon"
+                  class="h-7 w-7"
+                />
+                <div class="ml-1">Passer dans l'équipe bleue</div>
+              </button>
+            </div>
+          </template>
+        </div>
+        <hr class="border-gray-300" />
+      </template>
+      <div
+        class="bg-gray-200 px-2 py-4"
+        :class="{
+          'rounded-xl': status !== 'PENDING'
+        }"
+      >
+        <div class="px-2 text-center">
           <div class="mb-1">
             <label class="block" for="username-input">Pseudo</label>
             <input
@@ -86,17 +146,17 @@ const leaveRoom = async () => {
               type="text"
               id="username-input"
               placeholder="Choisissez votre pseudo"
-              class="text-center text-base rounded-xl shadow-inset text-black mb-1 py-2 border"
+              class="mb-1 rounded-xl border py-2 text-center text-base text-black shadow-inset"
             />
           </div>
           <button class="button" @click="changeUsername">Changer de pseudo</button>
         </div>
       </div>
       <hr class="border-gray-300" />
-      <div class="p-4 bg-gray-200">
-        <div class="flex justify-start items-center cursor-pointer">
-          <div class="w-14 mr-4">
-            <div class="w-full relative">
+      <div class="bg-gray-200 p-4">
+        <div class="flex cursor-pointer items-center justify-start">
+          <div class="mr-4 w-14">
+            <div class="relative w-full">
               <label class="switch">
                 <input v-model="isURLHidden" type="checkbox" />
                 <span class="slider round"></span>
@@ -107,11 +167,11 @@ const leaveRoom = async () => {
         </div>
       </div>
       <hr class="border-gray-300" />
-      <div class="flex justify-center py-4 bg-gray-200 rounded-bl-xl rounded-br-xl">
-        <button class="button shadow-bottom text-base" @click="leaveRoom">
+      <div class="flex justify-center rounded-bl-xl rounded-br-xl bg-gray-200 py-4">
+        <button class="button text-base shadow-bottom" @click="leaveRoom">
           <div class="flex items-center justify-center">
             <svg
-              class="flex-none w-5 mr-2 text-black fill-current"
+              class="mr-2 w-5 flex-none fill-current text-black"
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
               y="0px"
@@ -204,5 +264,9 @@ input:checked + .slider:before {
 .slider.round:before {
   border-radius: 50%;
 }
+
+.button-wrapper {
+  display: flex !important;
+  align-items: center;
+}
 </style>
-@/stores/userStore @/stores/roomUser

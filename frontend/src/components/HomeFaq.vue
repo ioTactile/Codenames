@@ -1,9 +1,9 @@
 <template>
-  <section class="bg-blackPurple text-center py-6">
+  <section class="bg-blackPurple py-6 text-center">
     <div class="mb-4">
-      <RouterLink to="#" class="underline hover:no-underline text-white text-lg">FAQ</RouterLink>
+      <RouterLink to="#" class="text-lg text-white underline hover:no-underline">FAQ</RouterLink>
     </div>
-    <p class="text-sm leading-4 text-lightGray px-2">
+    <p class="px-2 text-sm leading-4 text-lightGray">
       Vous êtes sur l'adaptation officielle du jeu de société Codenames. Veuillez noter que ce site
       web est encore en beta.
       <br />

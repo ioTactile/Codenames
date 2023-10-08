@@ -4,7 +4,7 @@ import { apiFetchData } from '@/utils/api'
 
 const props = defineProps<{
   id: number
-  players: Player[]
+  users: Player[]
   isHost: boolean
 }>()
 
@@ -37,30 +37,30 @@ const resetPlayers = async () => {
 
 <template>
   <div class="menu-wrapper">
-    <div class="bg-white rounded-xl shadow-bottom border-ui">
+    <div class="border-ui rounded-xl bg-white shadow-bottom">
       <div class="flex flex-col items-center p-4">
-        <h3 class="text-blue-700 text-center font-bold mb-2">
+        <h3 class="mb-2 text-center font-bold text-blue-700">
           Invitez des joueurs en leur envoyant ce lien :
         </h3>
         <input
           id="link"
           type="text"
           :value="`http://localhost:8080/room/${props.id}`"
-          class="text-center text-base rounded-xl shadow-inset text-black mb-1 w-[80%] p-2 border"
+          class="mb-1 w-[80%] rounded-xl border p-2 text-center text-base text-black shadow-inset"
         />
         <button @click="copyLink" class="button">Copier le lien dans le presse-papier.</button>
       </div>
       <hr class="border-gray-300" />
-      <div class="px-4 pt-4 pb-2 bg-gray-200">
-        <h3 class="text-center font-bold mb-2">Joueurs dans ce salon</h3>
-        <div class="flex justify-start items-start flex-wrap">
+      <div class="bg-gray-200 px-4 pb-2 pt-4">
+        <h3 class="mb-2 text-center font-bold">Joueurs dans ce salon</h3>
+        <div class="flex flex-wrap items-start justify-start">
           <div class="relative">
             <button
-              v-for="(player, i) in players"
+              v-for="(player, i) in users"
               :key="i"
-              class="inline-flex justify-start items-center py-0.5 px-1.5 m-1 outline-none hover:outline-none active:outline-none border-2 border-white rounded bg-white text-black italic cursor-default font-bold"
+              class="m-1 inline-flex cursor-default items-center justify-start rounded border-2 border-white bg-white px-1.5 py-0.5 font-bold italic text-black outline-none hover:outline-none active:outline-none"
             >
-              <span class="w-2 h-2 mr-1 rounded-full bg-green-online"></span>
+              <span class="mr-1 h-2 w-2 rounded-full bg-green-online"></span>
               <span>{{ player.name }}</span>
             </button>
           </div>
@@ -68,7 +68,7 @@ const resetPlayers = async () => {
       </div>
       <template v-if="isHost">
         <hr class="border-gray-300" />
-        <div class="p-2 bg-gray-200 text-center rounded-bl-xl rounded-br-xl">
+        <div class="rounded-bl-xl rounded-br-xl bg-gray-200 p-2 text-center">
           <div class="m-2 inline-block">
             <button @click="shufflePlayers" class="button">Répartir les équipes au hasard</button>
           </div>
@@ -77,7 +77,7 @@ const resetPlayers = async () => {
           </div>
         </div>
       </template>
-      <div v-else class="p-2 bg-gray-200 text-center rounded-bl-xl rounded-br-xl"></div>
+      <div v-else class="rounded-bl-xl rounded-br-xl bg-gray-200 p-2 text-center"></div>
     </div>
   </div>
 </template>

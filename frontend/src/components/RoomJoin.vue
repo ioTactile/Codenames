@@ -45,10 +45,10 @@ const joinRoom = async () => {
 
 <template>
   <div
-    class="bg-white rounded-xl pt-4 shadow-bottom border-ui flex flex-col will-change-transform w-96 max-w-9/10 overflow-hidden"
+    class="border-ui max-w-9/10 flex w-96 flex-col overflow-hidden rounded-xl bg-white pt-4 shadow-bottom will-change-transform"
   >
     <section class="px-2 pb-4 text-center">
-      <h1 class="text-xl font-bold mb-4">Bienvenue dans Codenames</h1>
+      <h1 class="mb-4 text-xl font-bold">Bienvenue dans Codenames</h1>
       <div class="mb-1 flex flex-col px-2">
         <label for="username-input"
           >Avant d'entrer dans ce salon, veuillez choisir votre pseudo</label
@@ -58,10 +58,10 @@ const joinRoom = async () => {
           id="username-input"
           type="text"
           v-model="username"
-          class="text-center text-base rounded-xl shadow-inset mb-1 border border-slate-300 w-[60%] mx-auto py-2"
+          class="mx-auto mb-1 w-[60%] rounded-xl border border-slate-300 py-2 text-center text-base shadow-inset"
         />
       </div>
-      <button @click="joinRoom" class="button shadow-xl rounded-2xl border-2 text-base">
+      <button @click="joinRoom" class="button rounded-2xl border-2 text-base shadow-xl">
         {{ location === 'create' ? 'Créer un salon' : 'Rejoindre le salon' }}
       </button>
     </section>

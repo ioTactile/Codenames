@@ -75,11 +75,11 @@ const isHost = computed(() => {
           class="absolute inset-0"
           :class="user?.playerTeam === 'BLUE' ? 'first-layer-blue' : 'first-layer-red'"
         ></div>
-        <div class="second-layer bg-cover absolute inset-0"></div>
+        <div class="second-layer absolute inset-0 bg-cover"></div>
         <div id="scaler">
           <div id="gamescene">
             <template v-if="isLoading">
-              <main class="flex justify-center items-center text-white font-bold h-screen px-2">
+              <main class="flex h-screen items-center justify-center px-2 font-bold text-white">
                 Connexion au salon...
               </main>
             </template>
@@ -105,7 +105,7 @@ const isHost = computed(() => {
                 </main>
               </template>
               <template v-else>
-                <main class="flex justify-center items-center h-screen px-2">
+                <main class="flex h-screen items-center justify-center px-2">
                   <Join location="join" />
                 </main>
               </template>

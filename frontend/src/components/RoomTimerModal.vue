@@ -47,18 +47,18 @@ const defineTimer = () => {
             leave-to="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
           >
             <div
-              class="rounded-xl shadow-bottom border-ui bg-white py-2 pb-4 portrait:w-11/12 landscape:w-1/3"
+              class="border-ui rounded-xl bg-white py-2 pb-4 shadow-bottom portrait:w-11/12 landscape:w-1/3"
             >
-              <h1 class="mb-2 text-xl font-bold text-center">Sablier</h1>
-              <p class="px-4 mb-4 text-base text-center">
+              <h1 class="mb-2 text-center text-xl font-bold">Sablier</h1>
+              <p class="mb-4 px-4 text-center text-base">
                 Choisissez la variante sablier et sa durée. Lorsque le sablier est écoulé, rien ne
                 se passe : c'est à vous de décider ce qu'il faut faire.
               </p>
-              <div class="flex flex-col justify-center items-center px-4">
-                <div class="block mb-4 text-base font-bold text-center">
+              <div class="flex flex-col items-center justify-center px-4">
+                <div class="mb-4 block text-center text-base font-bold">
                   Choisissez la variante sablier :
                 </div>
-                <div class="flex flex-col justify-center items-stretch mb-2 text-base">
+                <div class="mb-2 flex flex-col items-stretch justify-center text-base">
                   <label class="mb-2 cursor-pointer">
                     <input
                       v-model="timerType"
@@ -102,7 +102,7 @@ const defineTimer = () => {
                 </div>
               </div>
               <div class="w-full text-center">
-                <div class="inline-block mr-2">
+                <div class="mr-2 inline-block">
                   <button class="button" @click="defineTimer">Définir le sablier</button>
                 </div>
                 <button class="button" @click="emit('closeTimerMenu', false)">Annuler</button>

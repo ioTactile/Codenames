@@ -52,9 +52,9 @@ const getSupp = computed(() => {
 </script>
 
 <template>
-  <div class="relative flex items-center justify-center mx-auto h-16 w-full landscape:w-[1060px]">
+  <div class="relative mx-auto flex h-16 w-full items-center justify-center landscape:w-[1060px]">
     <div
-      class="bg-white px-2 py-1 shadow-bottom rounded-lg text-base landscape:text-2xl font-bold mx-12 text-center"
+      class="mx-12 rounded-lg bg-white px-2 py-1 text-center text-base font-bold shadow-bottom landscape:text-2xl"
     >
       <span>{{ getInstructions + getSupp }}</span>
     </div>

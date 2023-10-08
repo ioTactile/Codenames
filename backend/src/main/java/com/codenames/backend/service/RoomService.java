@@ -141,6 +141,11 @@ public class RoomService {
         if (player == null) {
             throw new IllegalArgumentException("Player not found");
         }
+        if (mapStringToPlayerTeam(team).equals(PlayerTeam.NONE)) {
+            player.setPlayerRole(PlayerRole.NONE);
+        } else {
+            player.setPlayerRole(PlayerRole.OPERATIVE);
+        }
         player.setPlayerTeam(mapStringToPlayerTeam(team));
         roomRepository.save(room);
     }

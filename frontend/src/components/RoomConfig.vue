@@ -19,16 +19,16 @@ const startRoom = async () => {
 </script>
 
 <template>
-  <div class="config-wrapper absolute bg-white rounded-xl shadow-bottom">
-    <div class="relative flex flex-col flex-1 justify-between">
-      <section class="overflow-y-auto bg-gray-200 rounded-tl-xl rounded-tr-xl">
-        <div class="bg-gray-200 rounded-xl relative flex flex-col">
-          <div class="relative p-2 pr-4 z-0">
-            <div class="config-bg z-[-1] absolute inset-0 bg-cover"></div>
-            <section class="flex justify-end mb-2 landscape:mb-0">
-              <button class="flex justify-center items-center py-1 group">
+  <div class="config-wrapper absolute rounded-xl bg-white shadow-bottom">
+    <div class="relative flex flex-1 flex-col justify-between">
+      <section class="overflow-y-auto rounded-tl-xl rounded-tr-xl bg-gray-200">
+        <div class="relative flex flex-col rounded-xl bg-gray-200">
+          <div class="relative z-0 p-2 pr-4">
+            <div class="config-bg absolute inset-0 z-[-1] bg-cover"></div>
+            <section class="mb-2 flex justify-end landscape:mb-0">
+              <button class="group flex items-center justify-center py-1">
                 <div
-                  class="rounded-lg border-2 border-white bg-white hover:border-yellow flex justify-center items-center px-2 py-1"
+                  class="flex items-center justify-center rounded-lg border-2 border-white bg-white px-2 py-1 hover:border-yellow"
                 >
                   <div class="mr-4 rtl:ml-4">
                     <img src="/images/arrow-right.svg" alt="Arrow right icon" class="w-[30px]" />
@@ -40,9 +40,9 @@ const startRoom = async () => {
                 </div>
               </button>
             </section>
-            <section class="flex justify-center items-center">
-              <img src="/images/box_cn.png" alt="Box image" class="relative h-[220px] ml-[-30px]" />
-              <div class="bg-white/50 rounded-lg p-2 ml-[-20px]">
+            <section class="flex items-center justify-center">
+              <img src="/images/box_cn.png" alt="Box image" class="relative ml-[-30px] h-[220px]" />
+              <div class="ml-[-20px] rounded-lg bg-white/50 p-2">
                 <div class="config-settings">
                   <p>Codenames est un jeu pour quatre joueurs et plus.</p>
                   <p>
@@ -64,12 +64,12 @@ const startRoom = async () => {
           </div>
         </div>
       </section>
-      <section class="flex justify-center items-center mt-auto py-4 portrait:pt-1 portrait:pb-1.5">
+      <section class="mt-auto flex items-center justify-center py-4 portrait:pb-1.5 portrait:pt-1">
         <div class="m-2">
-          <button class="button shadow-bottom text-base">Paramètres complets</button>
+          <button class="button text-base shadow-bottom">Paramètres complets</button>
         </div>
         <div class="m-2">
-          <button class="button shadow-bottom text-base color-green" @click="startRoom">
+          <button class="button color-green text-base shadow-bottom" @click="startRoom">
             Jouer avec les paramètres recommandés
           </button>
         </div>

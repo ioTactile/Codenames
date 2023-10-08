@@ -5,8 +5,8 @@ import Footer from '@/components/HomeFooter.vue'
 </script>
 
 <template>
-  <main class="flex flex-col w-full xl:min-h-700px overflow-x-hidden relative">
-    <div class="absolute w-full h-full -z-10 bg-purple">
+  <main class="relative flex w-full flex-col overflow-x-hidden xl:min-h-700px">
+    <div class="absolute -z-10 h-full w-full bg-purple">
       <span class="background-container">
         <img
           src="/images/bg_colorful.webp"
@@ -15,38 +15,38 @@ import Footer from '@/components/HomeFooter.vue'
         />
       </span>
     </div>
-    <div class="relative flex flex-col justify-start items-center z-40">
-      <div class="object-contain w-full mt-2 md:mt-6 max-w-2xl">
+    <div class="relative z-40 flex flex-col items-center justify-start">
+      <div class="mt-2 w-full max-w-2xl object-contain md:mt-6">
         <img src="/images/logo.webp" alt="Codenames logo" />
       </div>
-      <h1 class="text-vw sm:text-3xl font-black text-white text-shadow mt-2 xl-mt-8">
+      <h1 class="text-shadow xl-mt-8 mt-2 text-vw font-black text-white sm:text-3xl">
         Jouez avec vos amis.
       </h1>
-      <div class="flex flex-col mb-6 lg:mb-12">
+      <div class="mb-6 flex flex-col lg:mb-12">
         <RouterLink
           to="/room/create"
-          class="group transition-transform duration-75 transform active:scale-90 mt-6 mb-2 lg:mt-10 create-button-wrapper"
+          class="create-button-wrapper group mb-2 mt-6 transform transition-transform duration-75 active:scale-90 lg:mt-10"
         >
-          <div class="create-button group-hover:bg-tutorial group-hover:bg-none m-1 lg:px-8">
+          <div class="create-button m-1 group-hover:bg-tutorial group-hover:bg-none lg:px-8">
             CRÉER UN SALON
           </div>
         </RouterLink>
       </div>
     </div>
     <div
-      class="grid relative auto-cols-min grid-cols-2 md:grid-cols-3 justify-center align-center w-full mt-auto"
+      class="align-center relative mt-auto grid w-full auto-cols-min grid-cols-2 justify-center md:grid-cols-3"
     >
       <div class="relative md:col-start-1">
         <div
-          class="absolute flex justify-end bottom-0 w-38vw md:w-30vw 1201px:w-auto -left-6 sm:-left-10 1201px:-left-50 1460px:left-10 rtl:left-20"
+          class="absolute -left-6 bottom-0 flex w-38vw justify-end rtl:left-20 sm:-left-10 md:w-30vw 1201px:-left-50 1201px:w-auto 1460px:left-10"
         >
           <img src="/images/agent_male.png" alt="Male agent" />
         </div>
       </div>
       <div
-        class="tutorial relative text-xl leading-7 1201px:leading-8 justify-self-center col-span-2 md:col-span-1"
+        class="tutorial relative col-span-2 justify-self-center text-xl leading-7 md:col-span-1 1201px:leading-8"
       >
-        <h2 class="font-bold text-2xl text-purple mb-2">Comment jouer :</h2>
+        <h2 class="mb-2 text-2xl font-bold text-purple">Comment jouer :</h2>
         <b>1.</b>
         Cliquez sur le bouton CRÉER UN SALON.
         <br />
@@ -62,13 +62,13 @@ import Footer from '@/components/HomeFooter.vue'
         <b>5.</b>
         Amusez-vous bien !
         <br />
-        <div class="absolute right-2.5 bottom-2.5">
+        <div class="absolute bottom-2.5 right-2.5">
           <a href="https://www.iotactile.com" target="_blank">Réalisé par ioTactile</a>
         </div>
       </div>
       <div class="relative col-start-2 row-start-1 md:col-start-3">
         <div
-          class="absolute flex justify-end bottom-0 w-32vw md:w-26vw 1201px:w-auto -right-6 sm:-right-10 1201px:-right-50 1460px:right-10 rtl:right-20"
+          class="absolute -right-6 bottom-0 flex w-32vw justify-end rtl:right-20 sm:-right-10 md:w-26vw 1201px:-right-50 1201px:w-auto 1460px:right-10"
         >
           <img src="/images/agent_female.png" alt="Female agent" width="412" height="432" />
         </div>
