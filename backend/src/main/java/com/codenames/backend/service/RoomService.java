@@ -35,42 +35,32 @@ public class RoomService {
     }
 
     public Room createRoom(String pseudo) {
-        Room room = new Room();
-
-        room.setPlayers(new ArrayList<>());
-        room.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
-
-        List<Word> words = new ArrayList<>();
-
-        try {
-            words = getWords();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
+        Room room = initializeRoom();
+        room.getPlayers().add(createPlayer(pseudo));
+        List<Word> words = initializeWords();
         room.setWords(words);
-        room.setClues(new ArrayList<>());
+        setTeamAndRoleTurn(room, words);
+        roomRepository.save(room);
+        return room;
+    }
 
-        int redCount = (int) words.stream().filter(word -> word.getWordColor() == WordColor.RED).count();
-        int blueCount = (int) words.stream().filter(word -> word.getWordColor() == WordColor.BLUE).count();
-
-        if (redCount > blueCount) {
-            room.setTeamTurn(PlayerTeam.RED.toString());
-        } else {
-            room.setTeamTurn(PlayerTeam.BLUE.toString());
+    public void replay(Long roomId, List<String> pseudos) {
+        Room room = getRoomById(roomId);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
         }
-
-        room.setRoleTurn(PlayerRole.SPYMASTER.toString());
-        room.setRedRemainingWords(redCount);
-        room.setBlueRemainingWords(blueCount);
+        room.setPlayers(new ArrayList<>());
+        for (String pseudo : pseudos) {
+            room.getPlayers().add(createPlayer(pseudo));
+        }
+        List<Word> words = initializeWords();
+        room.setWords(words);
+        setTeamAndRoleTurn(room, words);
+        room.setClues(new ArrayList<>());
         room.setIsBlackCardSelected(false);
         room.setStatus(RoomStatus.PENDING);
-        room.setCreatedAt(LocalDateTime.now());
         room.setUpdatedAt(LocalDateTime.now());
-
         roomRepository.save(room);
-
-        return room;
     }
 
     public Room getRoomById(Long roomId) {
@@ -93,6 +83,9 @@ public class RoomService {
         Room room = getRoomById(roomId);
         if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
             throw new IllegalArgumentException("Room not found or not pending");
+        }
+        if (room.getPlayers().stream().anyMatch(player -> player.getName().equals(pseudo))) {
+            throw new IllegalArgumentException("Pseudo already used");
         }
         room.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE));
         roomRepository.save(room);
@@ -123,9 +116,9 @@ public class RoomService {
         if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
             throw new IllegalArgumentException("Room not found or not pending");
         }
-        // if (room.getPlayers().size() < 4) {
-        // throw new IllegalArgumentException("Not enough players");
-        // }
+        if (room.getPlayers().size() < 4) {
+            throw new IllegalArgumentException("Not enough players");
+        }
         room.setStatus(RoomStatus.IN_PROGRESS);
         room.setUpdatedAt(LocalDateTime.now());
         roomRepository.save(room);
@@ -273,6 +266,9 @@ public class RoomService {
         if (word == null) {
             throw new IllegalArgumentException("Word not found");
         }
+        if (word.getWordState().equals(WordState.CLICKED)) {
+            throw new IllegalArgumentException("Word already clicked");
+        }
         if (player.getPlayerTeam().toString().equals(room.getTeamTurn())) {
             if (word.getSelectedBy().contains(player.getName())) {
                 word.getSelectedBy().remove(player.getName());
@@ -304,6 +300,9 @@ public class RoomService {
                 .filter(w -> w.getWordName().equals(wordName)).findFirst().orElse(null);
         if (word == null) {
             throw new IllegalArgumentException("Word not found");
+        }
+        if (word.getWordState().equals(WordState.CLICKED)) {
+            throw new IllegalArgumentException("Word already clicked");
         }
         if (player.getPlayerTeam().toString().equals(room.getTeamTurn())) {
             if (room.getClues().size() == 0) {
@@ -435,5 +434,50 @@ public class RoomService {
             default:
                 return PlayerRole.NONE;
         }
+    }
+
+    private Room initializeRoom() {
+        Room room = new Room();
+        room.setPlayers(new ArrayList<>());
+        room.setClues(new ArrayList<>());
+        room.setIsBlackCardSelected(false);
+        room.setStatus(RoomStatus.PENDING);
+        room.setCreatedAt(LocalDateTime.now());
+        room.setUpdatedAt(LocalDateTime.now());
+        return room;
+    }
+
+    private Player createPlayer(String pseudo) {
+        return new Player(pseudo, PlayerTeam.NONE, PlayerRole.NONE);
+    }
+
+    private List<Word> initializeWords() {
+        List<Word> words;
+        try {
+            words = getWords();
+        } catch (IOException e) {
+            e.printStackTrace();
+            words = new ArrayList<>();
+        }
+        return words;
+    }
+
+    private void setTeamAndRoleTurn(Room room, List<Word> words) {
+        int redCount = countWordsByColor(words, WordColor.RED);
+        int blueCount = countWordsByColor(words, WordColor.BLUE);
+
+        if (redCount > blueCount) {
+            room.setTeamTurn(PlayerTeam.RED.toString());
+        } else {
+            room.setTeamTurn(PlayerTeam.BLUE.toString());
+        }
+
+        room.setRoleTurn(PlayerRole.SPYMASTER.toString());
+        room.setRedRemainingWords(redCount);
+        room.setBlueRemainingWords(blueCount);
+    }
+
+    private int countWordsByColor(List<Word> words, WordColor color) {
+        return (int) words.stream().filter(word -> word.getWordColor() == color).count();
     }
 }

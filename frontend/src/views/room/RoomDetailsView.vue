@@ -12,6 +12,7 @@ import BlueSide from '@/components/RoomBlueSide.vue'
 import History from '@/components/RoomHistory.vue'
 import SocialMedia from '@/components/SocialMedia.vue'
 import TimerModal from '@/components/RoomTimerModal.vue'
+import Replay from '@/components/RoomReplay.vue'
 import { apiFetchData } from '@/utils/api'
 import { useUserStore } from '@/stores/user'
 import { Stomp } from '@stomp/stompjs'
@@ -94,8 +95,14 @@ const isHost = computed(() => {
                   />
                   <Instructions :room="room" :is-host="isHost" :user="user" />
                   <Clue v-if="room.status === 'IN_PROGRESS'" :room="room" :user="user" />
-                  <Board v-if="room.status === 'IN_PROGRESS'" :room="room" :user="user" />
+                  <Board v-if="room.status !== 'PENDING'" :room="room" :user="user" />
                   <Config v-if="room.status === 'PENDING' && isHost" :room="room" />
+                  <Replay
+                    v-if="room.status === ('RED_TEAM_WINS' || 'BLUE_TEAM_WINS')"
+                    :room="room"
+                    :user="user"
+                    :is-host="isHost"
+                  />
                   <RedSide :room="room" :user="user" />
                   <div class="right flex flex-col">
                     <BlueSide :room="room" :user="user" />
@@ -165,4 +172,3 @@ const isHost = computed(() => {
   height: 900px;
 }
 </style>
-@/stores/userStore @/stores/roomUser

@@ -76,4 +76,3 @@ const joinRoom = async () => {
   border-color: rgb(255, 246, 167) rgb(255, 228, 0) rgb(243, 187, 0);
 }
 </style>
-@/stores/userStore @/stores/user

@@ -56,11 +56,9 @@ const sendClue = async () => {
   if (!isUserSpyTurn.value) return
   if (!clueName.value) return
   if (!clueNumber.value) return
-  const roomId = props.room.id
-  if (!roomId) return
 
   try {
-    await apiFetchData(`room/${roomId}`, 'PUT', {
+    await apiFetchData(`room/${props.room.id}`, 'PUT', {
       action: 'add-clue',
       clue: {
         clueName: clueName.value,
@@ -77,12 +75,11 @@ const sendClue = async () => {
 
 const teamTurn = async () => {
   if (!isUserOperativeTurn.value) return
-  const roomId = props.room.id
-  if (!roomId) return
 
   try {
-    await apiFetchData(`room/${roomId}`, 'PUT', {
-      action: 'team-turn'
+    await apiFetchData(`room/${props.room.id}`, 'PUT', {
+      action: 'manual-team-turn',
+      username: props.user?.name
     })
   } catch (error) {
     console.error('Error:', error)
@@ -92,7 +89,7 @@ const teamTurn = async () => {
 
 <template>
   <template v-if="isUserSpyTurn">
-    <div class="z-70 absolute top-[860px] w-full">
+    <div class="absolute top-[860px] z-70 w-full">
       <div class="flex w-full justify-end landscape:justify-center">
         <div
           class="flex w-10/12 max-w-screen-md flex-wrap items-center justify-center landscape:w-full"
@@ -211,4 +208,3 @@ const teamTurn = async () => {
   }
 }
 </style>
-@/stores/userStore @/stores/user

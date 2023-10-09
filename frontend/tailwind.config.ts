@@ -35,7 +35,8 @@ export default {
       boxShadow: {
         sharp: '4px 4px 0px 0px rgba(0, 0, 0, .59)',
         inset: 'inset 2px 2px 0px 0px silver',
-        bottom: '0 4px 0 0 rgba(0,0,0,.3)'
+        bottom: '0 4px 0 0 rgba(0,0,0,.3)',
+        card: '0 4px 0 -1px rgba(0,0,0,.3)'
       },
       fontSize: {
         vw: '4.5vw'
@@ -52,6 +53,9 @@ export default {
       },
       spacing: {
         '50': '50px'
+      },
+      zIndex: {
+        70: '70'
       },
       fontFamily: {
         fira: ['Fira Sans Extra Condensed', 'sans-serif']

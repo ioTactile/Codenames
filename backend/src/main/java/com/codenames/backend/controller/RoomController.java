@@ -1,5 +1,6 @@
 package com.codenames.backend.controller;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -31,10 +32,6 @@ public class RoomController {
         this.messagingTemplate = messagingTemplate;
     }
 
-    private void sendRoomUpdate(Room room) {
-        messagingTemplate.convertAndSend("/topic/room/" + room.getId(), room);
-    }
-
     @PostMapping("/create")
     public ResponseEntity<Room> create(@RequestBody Map<String, String> requestPayload) {
         String username = requestPayload.get("username");
@@ -45,11 +42,6 @@ public class RoomController {
     @GetMapping("/{id}")
     public Room get(@PathVariable("id") Long id) {
         return roomService.getRoomById(id);
-    }
-
-    @GetMapping("/all")
-    public List<Room> getAll() {
-        return roomService.getAllRooms();
     }
 
     @DeleteMapping("/{id}")
@@ -72,68 +64,56 @@ public class RoomController {
         switch (action) {
             case "join":
                 roomService.joinRoom(id, username);
-                Room roomJoin = roomService.getRoomById(id);
-                sendRoomUpdate(roomJoin);
-                return ResponseEntity.ok("Room joined");
+                break;
             case "leave":
                 roomService.leaveRoom(id, username);
-                Room roomLeave = roomService.getRoomById(id);
-                sendRoomUpdate(roomLeave);
-                return ResponseEntity.ok("Room left");
+                break;
             case "start":
                 roomService.startRoom(id);
-                Room roomStart = roomService.getRoomById(id);
-                sendRoomUpdate(roomStart);
-                return ResponseEntity.ok("Room started");
+                break;
             case "shuffle-players":
                 roomService.shufflePlayers(id);
-                Room roomShuffle = roomService.getRoomById(id);
-                sendRoomUpdate(roomShuffle);
-                return ResponseEntity.ok("Players shuffled");
+                break;
             case "reset-players":
                 roomService.resetPlayers(id);
-                Room roomReset = roomService.getRoomById(id);
-                sendRoomUpdate(roomReset);
-                return ResponseEntity.ok("Players reset");
+                break;
             case "select-team":
                 roomService.selectTeam(id, team, username);
-                Room roomSelectTeam = roomService.getRoomById(id);
-                sendRoomUpdate(roomSelectTeam);
-                return ResponseEntity.ok("Team selected");
+                break;
             case "select-role":
                 roomService.selectRole(id, role, team, username);
-                Room roomSelectRole = roomService.getRoomById(id);
-                sendRoomUpdate(roomSelectRole);
-                return ResponseEntity.ok("Role selected");
+                break;
             case "change-username":
                 roomService.changeUsername(id, username, newUsername);
-                Room roomChangeUsername = roomService.getRoomById(id);
-                sendRoomUpdate(roomChangeUsername);
-                return ResponseEntity.ok("Username changed");
+                break;
             case "manual-team-turn":
                 roomService.manualTeamTurn(id, username);
-                Room roomManualTeamTurn = roomService.getRoomById(id);
-                sendRoomUpdate(roomManualTeamTurn);
-                return ResponseEntity.ok("Team turn changed");
+                break;
             case "select-word":
                 roomService.selectWord(id, wordname, username);
-                Room roomSelectWord = roomService.getRoomById(id);
-                sendRoomUpdate(roomSelectWord);
-                return ResponseEntity.ok("Word selected");
+                break;
             case "click-word":
                 roomService.clickWord(id, wordname, username);
-                Room roomClickWord = roomService.getRoomById(id);
-                sendRoomUpdate(roomClickWord);
-                return ResponseEntity.ok("Word clicked");
+                break;
             case "add-clue":
                 ObjectMapper mapper = new ObjectMapper();
                 Clue clue = mapper.convertValue(requestPayload.get("clue"), Clue.class);
                 roomService.addClue(id, clue, username);
-                Room roomAddClue = roomService.getRoomById(id);
-                sendRoomUpdate(roomAddClue);
-                return ResponseEntity.ok("Clue added");
+                break;
+            case "replay":
+                List<String> usernames = (List<String>) requestPayload.get("usernames");
+                roomService.replay(id, usernames);
+                break;
             default:
                 return ResponseEntity.badRequest().body("Invalid action");
         }
+
+        Room updatedRoom = roomService.getRoomById(id);
+        sendRoomUpdate(updatedRoom);
+        return ResponseEntity.ok(action + " : action completed");
+    }
+
+    private void sendRoomUpdate(Room room) {
+        messagingTemplate.convertAndSend("/topic/room/" + room.getId(), room);
     }
 }

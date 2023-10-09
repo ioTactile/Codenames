@@ -22,9 +22,11 @@ const redSpymaster = computed(() => {
   )
 })
 
-const nonePlayers = computed(() => {
-  if (!props.room) return []
-  return props.room.players.filter((player) => player.playerTeam === 'NONE')
+const noRolePlayer = computed(() => {
+  if (!props.room) return false
+  return props.room.players.some(
+    (player) => props.user?.name === player.name && player.playerRole === 'NONE'
+  )
 })
 
 const joinRole = async (role: string) => {
@@ -68,9 +70,7 @@ const joinRole = async (role: string) => {
           </div>
           <div v-else class="pl-2 text-white">–</div>
           <button
-            v-if="
-              nonePlayers.length && (user?.playerTeam === 'RED' || user?.playerRole === 'OPERATIVE')
-            "
+            v-if="noRolePlayer && (user?.playerTeam === 'RED' || user?.playerTeam === 'NONE')"
             class="button text-base shadow-bottom"
             @click="joinRole('OPERATIVE')"
           >
@@ -129,4 +129,3 @@ const joinRole = async (role: string) => {
   transform-origin: 50% 50% 0px;
 }
 </style>
-@/stores/userStore
