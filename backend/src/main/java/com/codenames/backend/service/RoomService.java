@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,9 @@ public class RoomService {
 
     public void replay(Long roomId, List<String> pseudos) {
         Room room = getRoomById(roomId);
-        if (room == null) {
-            throw new IllegalArgumentException("Room not found");
+        if (room == null || !room.getStatus().equals(RoomStatus.RED_TEAM_WINS) &&
+                !room.getStatus().equals(RoomStatus.BLUE_TEAM_WINS)) {
+            throw new IllegalArgumentException("Room not found or not finished");
         }
         room.setPlayers(new ArrayList<>());
         for (String pseudo : pseudos) {
@@ -72,8 +74,8 @@ public class RoomService {
     }
 
     public void deleteRoomById(Long roomId) {
-        boolean exists = roomRepository.existsById(roomId);
-        if (!exists) {
+        Optional<Room> roomOptional = roomRepository.findById(roomId);
+        if (!roomOptional.isPresent()) {
             throw new IllegalStateException("Room with id " + roomId + " does not exist");
         }
         roomRepository.deleteById(roomId);
@@ -96,8 +98,8 @@ public class RoomService {
         if (room == null || !room.getStatus().equals(RoomStatus.IN_PROGRESS)) {
             throw new IllegalArgumentException("Room not found or not in progress");
         }
-        String pseudo = "Spectateur " + (int) room.getPlayers().stream()
-                .filter(player -> player.getPlayerRole().equals(PlayerRole.SPECTATOR)).count();
+        String pseudo = "Spectateur " + (int) (room.getPlayers().stream()
+                .filter(player -> player.getPlayerRole().equals(PlayerRole.SPECTATOR)).count() + 1);
         room.getPlayers().add(new Player(pseudo, PlayerTeam.NONE, PlayerRole.SPECTATOR));
         roomRepository.save(room);
     }
@@ -175,6 +177,9 @@ public class RoomService {
         if (player == null) {
             throw new IllegalArgumentException("Player not found");
         }
+        if (room.getPlayers().stream().anyMatch(p -> p.getName().equals(newPseudo))) {
+            throw new IllegalArgumentException("Pseudo already used");
+        }
         player.setName(newPseudo);
         roomRepository.save(room);
     }
@@ -218,20 +223,6 @@ public class RoomService {
             player.setPlayerTeam(PlayerTeam.NONE);
             player.setPlayerRole(PlayerRole.NONE);
         }
-        roomRepository.save(room);
-    }
-
-    public void switchTeamTurn(Long roomId) {
-        Room room = getRoomById(roomId);
-        if (room == null || !room.getStatus().equals(RoomStatus.IN_PROGRESS)) {
-            throw new IllegalArgumentException("Room not found or not in progress");
-        }
-        if (room.getTeamTurn().equals(PlayerTeam.RED.toString())) {
-            room.setTeamTurn(PlayerTeam.BLUE.toString());
-        } else {
-            room.setTeamTurn(PlayerTeam.RED.toString());
-        }
-        room.setRoleTurn(PlayerRole.SPYMASTER.toString());
         roomRepository.save(room);
     }
 
@@ -412,6 +403,20 @@ public class RoomService {
         Collections.shuffle(wordsToReturn);
 
         return wordsToReturn;
+    }
+
+    private void switchTeamTurn(Long roomId) {
+        Room room = getRoomById(roomId);
+        if (room == null || !room.getStatus().equals(RoomStatus.IN_PROGRESS)) {
+            throw new IllegalArgumentException("Room not found or not in progress");
+        }
+        if (room.getTeamTurn().equals(PlayerTeam.RED.toString())) {
+            room.setTeamTurn(PlayerTeam.BLUE.toString());
+        } else {
+            room.setTeamTurn(PlayerTeam.RED.toString());
+        }
+        room.setRoleTurn(PlayerRole.SPYMASTER.toString());
+        roomRepository.save(room);
     }
 
     private PlayerTeam mapStringToPlayerTeam(String team) {
