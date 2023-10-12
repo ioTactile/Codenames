@@ -40,7 +40,7 @@ const joinRole = async (role: string) => {
       team: 'RED'
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 </script>

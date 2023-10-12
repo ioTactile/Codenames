@@ -1,6 +1,5 @@
 package com.codenames.backend.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -76,6 +75,9 @@ public class RoomController {
                 break;
             case "reset-players":
                 roomService.resetPlayers(id);
+                break;
+            case "change-host":
+                roomService.changeHost(id, username);
                 break;
             case "select-team":
                 roomService.selectTeam(id, team, username);

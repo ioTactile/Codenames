@@ -13,7 +13,7 @@ const startRoom = async () => {
       action: 'start'
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 </script>

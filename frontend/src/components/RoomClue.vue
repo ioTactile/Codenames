@@ -69,7 +69,7 @@ const sendClue = async () => {
       username: props.user?.name
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 
@@ -82,7 +82,7 @@ const teamTurn = async () => {
       username: props.user?.name
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 </script>

@@ -40,7 +40,7 @@ const clickWord = async (word: Word): Promise<void> => {
       wordname: word.wordName
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 
@@ -57,7 +57,7 @@ const selectWord = async (word: Word): Promise<void> => {
       wordname: word.wordName
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 

@@ -36,7 +36,7 @@ const joinRoom = async () => {
       userStore.setUser(roomId, username.value)
     }
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   } finally {
     username.value = ''
   }

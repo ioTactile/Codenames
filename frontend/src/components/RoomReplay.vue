@@ -37,7 +37,7 @@ const replay = async () => {
       usernames: getUsernames()
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 

@@ -29,6 +29,7 @@ import com.codenames.backend.model.Word;
 import com.codenames.backend.model.WordColor;
 import com.codenames.backend.model.WordState;
 import com.codenames.backend.repository.RoomRepository;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -352,6 +353,27 @@ public class RoomServiceTest {
         assertEquals(expectedRoom.getPlayers().get(0).getPlayerRole(), PlayerRole.NONE);
         assertEquals(expectedRoom.getPlayers().get(1).getPlayerTeam(), PlayerTeam.NONE);
         assertEquals(expectedRoom.getPlayers().get(1).getPlayerRole(), PlayerRole.NONE);
+    }
+
+    @Test
+    void testChangeHost() {
+        Long roomId = 1L;
+        String pseudo = "jordan";
+        String pseudoTwo = "thomas";
+        Room expectedRoom = initializeRoom();
+        expectedRoom.getPlayers().add(createPlayer(pseudo));
+        expectedRoom.getPlayers().add(createPlayer(pseudoTwo));
+        List<Word> words = initializeWords();
+        expectedRoom.setWords(words);
+        setTeamAndRoleTurn(expectedRoom, words);
+
+        when(roomRepository.findById(roomId)).thenReturn(Optional.of(expectedRoom));
+        when(roomRepository.save(expectedRoom)).thenReturn(expectedRoom);
+
+        roomService.changeHost(roomId, pseudoTwo);
+
+        assertEquals(expectedRoom.getPlayers().get(0).getName(), pseudoTwo);
+        assertEquals(expectedRoom.getPlayers().get(1).getName(), pseudo);
     }
 
     @Test

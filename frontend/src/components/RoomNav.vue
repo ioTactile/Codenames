@@ -37,7 +37,13 @@ const togglePlayerMenu = () => {
             <span>{{ room?.players.length }}</span>
           </div>
         </button>
-        <Players v-if="isPlayersMenuOpen" :users="room.players" :id="room.id" :is-host="isHost" />
+        <Players
+          v-if="isPlayersMenuOpen"
+          :users="room.players"
+          :id="room.id"
+          :is-host="isHost"
+          :room-status="room.status"
+        />
       </div>
       <button
         v-if="isHost"

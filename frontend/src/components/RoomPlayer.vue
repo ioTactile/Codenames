@@ -53,7 +53,7 @@ const changeUsername = async () => {
     })
     userStore.setUser(props.id, username.value)
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 
@@ -67,7 +67,7 @@ const leaveRoom = async () => {
     userStore.removeUser(props.id, username.value)
     router.push({ name: 'home' })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 
@@ -81,7 +81,7 @@ const selectTeam = async (team: string) => {
       team
     })
   } catch (error) {
-    console.error('Error:', error)
+    console.error(error)
   }
 }
 </script>

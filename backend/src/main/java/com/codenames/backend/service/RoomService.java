@@ -226,6 +226,23 @@ public class RoomService {
         roomRepository.save(room);
     }
 
+    public void changeHost(Long roomId, String pseudo) {
+        Room room = getRoomById(roomId);
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
+        }
+        Player player = room.getPlayers().stream()
+                .filter(p -> p.getName().equals(pseudo)).findFirst().orElse(null);
+        if (player == null) {
+            throw new IllegalArgumentException("Player not found");
+        }
+        List<Player> players = room.getPlayers();
+        players.remove(player);
+        players.add(0, player);
+        room.setPlayers(players);
+        roomRepository.save(room);
+    }
+
     public void manualTeamTurn(Long roomId, String pseudo) {
         Room room = getRoomById(roomId);
         if (room == null || !room.getStatus().equals(RoomStatus.IN_PROGRESS)) {
