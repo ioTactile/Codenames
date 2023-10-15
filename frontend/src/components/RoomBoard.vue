@@ -173,6 +173,7 @@ const getBackground = (color: string): string => {
 .center {
   position: absolute;
   top: 150px;
+  width: 55%;
   left: 50%;
   transform: translateX(-50%);
 }
