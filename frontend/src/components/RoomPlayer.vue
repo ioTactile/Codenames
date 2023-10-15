@@ -39,7 +39,7 @@ watch(isURLHidden, (value) => {
   }
 })
 
-const changeUsername = async () => {
+const changeUsername = async (): Promise<void> => {
   if (!username.value) {
     alert('Veuillez choisir un pseudo')
     return
@@ -57,7 +57,7 @@ const changeUsername = async () => {
   }
 }
 
-const leaveRoom = async () => {
+const leaveRoom = async (): Promise<void> => {
   if (props.status !== 'PENDING') return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', {
@@ -71,7 +71,7 @@ const leaveRoom = async () => {
   }
 }
 
-const selectTeam = async (team: string) => {
+const selectTeam = async (team: string): Promise<void> => {
   if (props.status !== 'PENDING') return
   if (props.user?.playerTeam === 'NONE') return
   try {

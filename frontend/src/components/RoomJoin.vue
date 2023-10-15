@@ -16,7 +16,7 @@ const route = useRoute()
 
 const userStore = useUserStore()
 
-const joinRoom = async () => {
+const joinRoom = async (): Promise<void> => {
   if (!username.value) {
     alert('Veuillez choisir un pseudo')
     return

@@ -9,7 +9,7 @@ const props = defineProps<{
   isHost: boolean
 }>()
 
-const isTeamWin = computed(() => {
+const isTeamWin = computed((): string => {
   if (props.user?.playerTeam === 'RED' && props.room.status === 'RED_TEAM_WINS') {
     return 'Vous avez gagné !'
   } else if (props.user?.playerTeam === 'BLUE' && props.room.status === 'BLUE_TEAM_WINS') {
@@ -19,7 +19,7 @@ const isTeamWin = computed(() => {
   }
 })
 
-const details = computed(() => {
+const details = computed((): string => {
   if (props.room.teamTurn === 'RED' && props.room.redRemainingWords === 0) {
     return "L'équipe rouge a trouvé tous les mots !"
   } else if (props.room.teamTurn === 'BLUE' && props.room.blueRemainingWords === 0) {
@@ -28,7 +28,7 @@ const details = computed(() => {
   return `L'équipe ${props.room.teamTurn} a trouvé l'assassin !`
 })
 
-const replay = async () => {
+const replay = async (): Promise<void> => {
   if (props.room.status === 'IN_PROGRESS') return
   if (!props.isHost) return
   try {
@@ -41,7 +41,7 @@ const replay = async () => {
   }
 }
 
-const getUsernames = () => {
+const getUsernames = (): String[] => {
   const usernames = props.room.players.map((player) => player.name)
   return usernames
 }

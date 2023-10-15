@@ -371,7 +371,7 @@ public class RoomService {
         if (room.getWords().stream().anyMatch(word -> word.getWordName().equals(clue.getClueName()))) {
             throw new IllegalArgumentException("Clue name is a word from the board");
         }
-        room.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), clue.getAttempts(), player.getName()));
+        room.getClues().add(new Clue(clue.getClueName(), clue.getAttempts(), clue.getRemaining(), player.getName()));
         room.setRoleTurn(PlayerRole.OPERATIVE.toString());
         roomRepository.save(room);
     }

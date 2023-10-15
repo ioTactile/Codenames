@@ -12,17 +12,17 @@ const props = defineProps<{
 
 const isPlayerMenuOpen = ref<number | null>(null)
 
-const togglePlayerMenu = (playerIndex: number) => {
+const togglePlayerMenu = (playerIndex: number): void => {
   isPlayerMenuOpen.value = isPlayerMenuOpen.value === playerIndex ? null : playerIndex
 }
 
-const copyLink = () => {
+const copyLink = (): void => {
   const link = document.getElementById('link') as HTMLInputElement
   link.select()
   document.execCommand('copy')
 }
 
-const shufflePlayers = async () => {
+const shufflePlayers = async (): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'shuffle-players' })
@@ -31,7 +31,7 @@ const shufflePlayers = async () => {
   }
 }
 
-const resetPlayers = async () => {
+const resetPlayers = async (): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'reset-players' })
@@ -40,7 +40,7 @@ const resetPlayers = async () => {
   }
 }
 
-const changeHost = async (name: string) => {
+const changeHost = async (name: string): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'change-host', username: name })
@@ -49,7 +49,7 @@ const changeHost = async (name: string) => {
   }
 }
 
-const kickPlayer = async (name: string) => {
+const kickPlayer = async (name: string): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'leave', username: name })

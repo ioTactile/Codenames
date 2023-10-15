@@ -8,28 +8,28 @@ const props = defineProps<{
   user: Player | null
 }>()
 
-const redAgents = computed(() => {
+const redAgents = computed((): Player[] => {
   if (!props.room) return []
   return props.room.players.filter(
     (player) => player.playerTeam === 'RED' && player.playerRole === 'OPERATIVE'
   )
 })
 
-const redSpymaster = computed(() => {
+const redSpymaster = computed((): Player[] => {
   if (!props.room) return []
   return props.room.players.filter(
     (player) => player.playerTeam === 'RED' && player.playerRole === 'SPYMASTER'
   )
 })
 
-const noRolePlayer = computed(() => {
+const noRolePlayer = computed((): boolean => {
   if (!props.room) return false
   return props.room.players.some(
     (player) => props.user?.name === player.name && player.playerRole === 'NONE'
   )
 })
 
-const joinRole = async (role: string) => {
+const joinRole = async (role: string): Promise<void> => {
   if (props.user?.playerTeam === 'BLUE') return
   try {
     const roomId = props.room.id

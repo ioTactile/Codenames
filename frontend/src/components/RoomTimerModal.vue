@@ -12,7 +12,7 @@ const emit = defineEmits<{
 
 const timerType = ref<'off' | 'manual' | 'side' | 'role'>('off')
 
-const defineTimer = () => {
+const defineTimer = (): void => {
   alert('Timer defined')
   emit('closeTimerMenu', false)
 }

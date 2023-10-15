@@ -8,7 +8,7 @@ const props = defineProps<{
   user: Player | null
 }>()
 
-const getInstructions = computed(() => {
+const getInstructions = computed((): string => {
   switch (props.room.status) {
     case 'PENDING':
       if (props.isHost) {
@@ -42,7 +42,7 @@ const getInstructions = computed(() => {
   }
 })
 
-const getSupp = computed(() => {
+const getSupp = computed((): string => {
   if (props.user?.playerRole === 'NONE') {
     return ' (Pour jouer, vous devez rejoindre une équipe.)'
   } else {

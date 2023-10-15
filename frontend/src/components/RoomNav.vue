@@ -17,11 +17,11 @@ const emit = defineEmits<{
 const isPlayersMenuOpen = ref<boolean>(false)
 const isPlayerMenuOpen = ref<boolean>(false)
 
-const togglePlayersMenu = () => {
+const togglePlayersMenu = (): void => {
   isPlayersMenuOpen.value = !isPlayersMenuOpen.value
 }
 
-const togglePlayerMenu = () => {
+const togglePlayerMenu = (): void => {
   isPlayerMenuOpen.value = !isPlayerMenuOpen.value
 }
 </script>

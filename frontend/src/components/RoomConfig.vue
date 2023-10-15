@@ -6,7 +6,7 @@ const props = defineProps<{
   room: Room
 }>()
 
-const startRoom = async () => {
+const startRoom = async (): Promise<void> => {
   const roomId = props.room.id
   try {
     await apiFetchData(`room/${roomId}`, 'PUT', {

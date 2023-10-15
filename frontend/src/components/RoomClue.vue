@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Player, Room } from '@/types/types'
+import type { Clue, Player, Room } from '@/types/types'
 import { computed, ref, watch } from 'vue'
 import { apiFetchData } from '@/utils/api'
 import Social from '@/components/SocialMedia.vue'
@@ -16,7 +16,7 @@ const clueName = ref<string>('')
 const clueOptions = ref<number[]>([0, 1, 2, 3, 4, 5, 6, 7, 8, 9])
 const showClue = ref<boolean>(false)
 
-const isUserSpyTurn = computed(() => {
+const isUserSpyTurn = computed((): boolean => {
   return !!(
     props.user?.playerRole === 'SPYMASTER' &&
     props.user?.playerTeam === props.room.teamTurn &&
@@ -25,7 +25,7 @@ const isUserSpyTurn = computed(() => {
   )
 })
 
-const isUserOperativeTurn = computed(() => {
+const isUserOperativeTurn = computed((): boolean => {
   return !!(
     props.user?.playerRole === 'OPERATIVE' &&
     props.user?.playerTeam === props.room.teamTurn &&
@@ -34,12 +34,12 @@ const isUserOperativeTurn = computed(() => {
   )
 })
 
-const getLastClue = computed(() => {
+const getLastClue = computed((): Clue => {
   const lastClue = props.room.clues[props.room.clues.length - 1]
   return lastClue
 })
 
-const getRoleTurn = () => {
+const getRoleTurn = (): void => {
   if (props.room.roleTurn === 'OPERATIVE') {
     showClue.value = true
   } else {
@@ -54,7 +54,7 @@ watch(
   }
 )
 
-const sendClue = async () => {
+const sendClue = async (): Promise<void> => {
   if (!isUserSpyTurn.value) return
   if (!clueName.value) return
   if (!clueNumber.value) return
@@ -75,7 +75,7 @@ const sendClue = async () => {
   }
 }
 
-const teamTurn = async () => {
+const teamTurn = async (): Promise<void> => {
   if (!isUserOperativeTurn.value) return
 
   try {
