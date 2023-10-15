@@ -45,20 +45,20 @@ const joinRoom = async () => {
 
 <template>
   <div
-    class="border-ui max-w-9/10 flex w-96 flex-col overflow-hidden rounded-xl bg-white pt-4 shadow-bottom will-change-transform"
+    class="border-ui max-w-9/10 flex w-96 flex-col overflow-hidden rounded-xl bg-white pt-4 text-black shadow-bottom will-change-transform"
   >
     <section class="px-2 pb-4 text-center">
       <h1 class="mb-4 text-xl font-bold">Bienvenue dans Codenames</h1>
-      <div class="mb-1 flex flex-col px-2">
-        <label for="username-input"
-          >Avant d'entrer dans ce salon, veuillez choisir votre pseudo</label
-        >
+      <div class="mb-1 px-2">
+        <label for="username-input" class="block">
+          Avant d'entrer dans ce salon, veuillez choisir votre pseudo
+        </label>
         <input
           placeholder="Choisissez votre pseudo"
           id="username-input"
           type="text"
           v-model="username"
-          class="mx-auto mb-1 w-[60%] rounded-xl border border-slate-300 py-2 text-center text-base shadow-inset"
+          class="mx-auto mb-1 rounded-xl border p-2 text-center text-base text-black shadow-inset"
         />
       </div>
       <button @click="joinRoom" class="button rounded-2xl border-2 text-base shadow-xl">

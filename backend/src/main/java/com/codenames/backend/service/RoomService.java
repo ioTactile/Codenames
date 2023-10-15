@@ -118,9 +118,9 @@ public class RoomService {
         if (room == null || !room.getStatus().equals(RoomStatus.PENDING)) {
             throw new IllegalArgumentException("Room not found or not pending");
         }
-        if (room.getPlayers().size() < 4) {
-            throw new IllegalArgumentException("Not enough players");
-        }
+        // if (room.getPlayers().size() < 4) {
+        // throw new IllegalArgumentException("Not enough players");
+        // }
         room.setStatus(RoomStatus.IN_PROGRESS);
         room.setUpdatedAt(LocalDateTime.now());
         roomRepository.save(room);

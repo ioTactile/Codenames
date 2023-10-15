@@ -17,7 +17,6 @@ export default {
         blackPurple: '#1D0011',
         lightGray: '#CCCCCC',
         darkGray: '#727272',
-        tutorial: '#FDE39C',
         'tutorial-desktop': 'hsla(86,70%,87%,.7)',
         'green-online': '#3fda36',
         'red-team-bg': '#8f2b1c',
@@ -25,7 +24,14 @@ export default {
         'blue-team-bg': '#3284a3',
         'blue-light': '#7bcae9'
       },
+      backgroundColor: {
+        tutorial: '#FBC638'
+      },
+      borderColor: {
+        tutorial: '#FDE39C'
+      },
       screens: {
+        mobile: '501px',
         '1201px': '1201px',
         '1460px': '1460px'
       },

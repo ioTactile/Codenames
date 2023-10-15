@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import type { Room } from '@/types/types'
 import Nav from '@/components/RoomNav.vue'
 import Join from '@/components/RoomJoin.vue'
@@ -15,8 +15,9 @@ import TimerModal from '@/components/RoomTimerModal.vue'
 import Replay from '@/components/RoomReplay.vue'
 import { apiFetchData } from '@/utils/api'
 import { useUserStore } from '@/stores/user'
-import { Stomp } from '@stomp/stompjs'
+import { CompatClient, Stomp } from '@stomp/stompjs'
 import SockJS from 'sockjs-client/dist/sockjs.min.js'
+import { useWindowSize } from '@vueuse/core'
 
 const props = defineProps<{
   id: number
@@ -26,6 +27,11 @@ const userStore = useUserStore()
 const room = ref<Room | null>(null)
 const isTimerMenuOpen = ref<boolean>(false)
 const isLoading = ref<boolean>(true)
+const stompClient = ref<CompatClient | null>(null)
+const isDisconnected = ref<boolean>(false)
+const afkTimer = ref<number | undefined>(undefined)
+const scale = ref<number>(1)
+const { width: windowWidth, height: windowHeight } = useWindowSize()
 
 onMounted(async () => {
   const roomId = props.id
@@ -38,18 +44,25 @@ onMounted(async () => {
     isLoading.value = false
 
     const socket = new SockJS('http://localhost:8080/ws')
-    const stompClient = Stomp.over(socket)
+    stompClient.value = Stomp.over(socket)
 
-    stompClient.connect({}, () => {
-      stompClient.subscribe(`/topic/room/${roomId}`, (response: any) => {
+    stompClient.value.connect({}, () => {
+      if (!stompClient.value) return
+      stompClient.value.subscribe(`/topic/room/${roomId}`, (response: any) => {
         const data = JSON.parse(response.body)
         room.value = data
-
-        console.log('room updated', room.value)
       })
     })
+    handleUserActivity()
   } catch (error) {
     console.error(error)
+  }
+})
+
+onUnmounted(() => {
+  clearTimeout(afkTimer.value)
+  if (stompClient.value) {
+    stompClient.value.disconnect()
   }
 })
 
@@ -66,27 +79,73 @@ const isHost = computed(() => {
   const host = room.value.players[0].name
   return host === user.value?.name
 })
+
+const disconnnectOnAfk = () => {
+  if (stompClient.value) {
+    stompClient.value.disconnect(() => {
+      isDisconnected.value = true
+    })
+  }
+}
+
+const handleUserActivity = () => {
+  clearTimeout(afkTimer.value)
+  afkTimer.value = setTimeout(disconnnectOnAfk, 600000)
+}
+
+const reconnectToWebsocket = () => {
+  clearTimeout(afkTimer.value)
+  const socket = new SockJS('http://localhost:8080/ws')
+  stompClient.value = Stomp.over(socket)
+
+  stompClient.value.connect({}, () => {
+    if (!stompClient.value) return
+    stompClient.value.subscribe(`/topic/room/${room.value?.id}`, (response: any) => {
+      const data = JSON.parse(response.body)
+      room.value = data
+    })
+  })
+  isDisconnected.value = false
+}
+
+const handleResize = () => {
+  const targetHeight = 1080
+  const targetWidth = (16 / 9) * targetHeight
+
+  if (window.innerWidth <= 500) {
+    scale.value = 1
+    return
+  }
+  scale.value = Math.min(windowHeight.value / targetHeight, windowWidth.value / targetWidth)
+}
+watch(
+  [windowHeight, windowWidth],
+  () => {
+    handleResize()
+  },
+  { immediate: true }
+)
 </script>
 
 <template>
   <template v-if="room">
-    <div class="absolute h-full">
-      <div class="relative h-screen w-screen">
+    <div id="app">
+      <div id="view">
         <div
           class="absolute inset-0"
           :class="user?.playerTeam === 'BLUE' ? 'first-layer-blue' : 'first-layer-red'"
         ></div>
         <div class="second-layer absolute inset-0 bg-cover"></div>
-        <div id="scaler">
-          <div id="gamescene">
-            <template v-if="isLoading">
-              <main class="flex h-screen items-center justify-center px-2 font-bold text-white">
-                Connexion au salon...
-              </main>
-            </template>
-            <template v-else>
+        <template v-if="isLoading">
+          <main class="flex h-screen items-center justify-center px-2 font-bold text-white">
+            Connexion au salon...
+          </main>
+        </template>
+        <template v-else-if="!isLoading && !isDisconnected">
+          <div id="scaler" :style="{ transform: `scale(${scale})` }">
+            <div id="gamescene">
               <template v-if="user">
-                <main>
+                <main class="h-full w-full">
                   <Nav
                     :room="room"
                     :is-host="isHost"
@@ -94,7 +153,12 @@ const isHost = computed(() => {
                     @open-timer-menu="isTimerMenuOpen = $event"
                   />
                   <Instructions :room="room" :is-host="isHost" :user="user" />
-                  <Clue v-if="room.status === 'IN_PROGRESS'" :room="room" :user="user" />
+                  <Clue
+                    v-if="room.status === 'IN_PROGRESS'"
+                    :room="room"
+                    :user="user"
+                    :window-width="windowWidth"
+                  />
                   <Board v-if="room.status !== 'PENDING'" :room="room" :user="user" />
                   <Config v-if="room.status === 'PENDING' && isHost" :room="room" />
                   <Replay
@@ -103,12 +167,23 @@ const isHost = computed(() => {
                     :user="user"
                     :is-host="isHost"
                   />
-                  <RedSide :room="room" :user="user" />
-                  <div class="right flex flex-col">
-                    <BlueSide :room="room" :user="user" />
-                    <History :room="room" />
-                    <SocialMedia />
-                  </div>
+                  <template v-if="windowWidth > 500">
+                    <div class="left">
+                      <RedSide :room="room" :user="user" />
+                    </div>
+                    <div class="right flex flex-col">
+                      <BlueSide :room="room" :user="user" />
+                      <History :room="room" />
+                      <SocialMedia size="landscape" />
+                    </div>
+                  </template>
+                  <template v-else>
+                    <div class="bottom">
+                      <RedSide :room="room" :user="user" />
+                      <History :room="room" />
+                      <BlueSide :room="room" :user="user" />
+                    </div>
+                  </template>
                 </main>
               </template>
               <template v-else>
@@ -116,9 +191,32 @@ const isHost = computed(() => {
                   <Join location="join" />
                 </main>
               </template>
-            </template>
+            </div>
           </div>
-        </div>
+          <button class="absolute bottom-0 left-0 z-10">
+            <img
+              src="/images/button.png"
+              alt="News button"
+              class="pointer-events-none"
+              :style="`height: ${scale * 150}px`"
+            />
+          </button>
+        </template>
+        <template v-else-if="!isLoading && isDisconnected">
+          <div class="flex min-h-full items-center justify-center text-center text-white">
+            <div class="max-w-screen-sm">
+              <h1 class="mb-2 px-2 text-2xl font-bold">
+                Vous avez été déconnecté pour cause d'inactivité.
+              </h1>
+              <p class="text-md mb-4 px-2">
+                Si vous voulez continuer à jouer, vous pouvez vous reconnecter au salon.
+              </p>
+              <button class="button shadow-button text-base" @click="reconnectToWebsocket">
+                Se reconnecter au salon
+              </button>
+            </div>
+          </div>
+        </template>
         <TimerModal
           :isTimerMenuOpen="isTimerMenuOpen"
           @close-timer-menu="isTimerMenuOpen = $event"
@@ -129,10 +227,21 @@ const isHost = computed(() => {
 </template>
 
 <style scoped>
-.view {
+#app {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  transition: transform 200ms ease 0s;
+  user-select: none;
+  overflow: hidden;
+}
+
+#view {
+  position: relative;
   width: 100vw;
   height: 100vh;
 }
+
 .first-layer-red {
   z-index: -1;
   background: radial-gradient(circle at 50% 50%, rgb(231, 102, 60) 0%, rgb(72, 12, 2) 100%);
@@ -151,24 +260,55 @@ const isHost = computed(() => {
 
 #scaler {
   position: relative;
+  transform-origin: top center;
   border: 0px solid transparent;
-  transform: scale(0.8);
+  transition: transform 200ms;
 }
 
-/* #gamescene {
+#gamescene {
   position: absolute;
   left: 50%;
   top: 0px;
   transform: translateX(-50%);
   width: 1920px;
   height: 1080px;
-} */
+}
 
-.right {
+@media screen and (max-width: 500px) {
+  #gamescene {
+    width: 500px;
+    min-height: 700px;
+    max-height: 1080px;
+  }
+}
+
+@media screen and (min-width: 501px) {
+  .left {
+    position: absolute;
+    top: 150px;
+    left: 20px;
+    width: 340px;
+    height: 900px;
+  }
+}
+
+@media screen and (min-width: 501px) {
+  .right {
+    position: absolute;
+    top: 150px;
+    right: 20px;
+    width: 340px;
+    height: 900px;
+  }
+}
+
+.bottom {
   position: absolute;
-  top: 150px;
-  right: 20px;
-  width: 340px;
-  height: 900px;
+  bottom: 0px;
+  width: 100%;
+  height: 100%;
+  transform: translateY(50%);
+  display: flex;
+  overflow: hidden;
 }
 </style>

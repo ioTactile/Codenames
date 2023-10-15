@@ -10,9 +10,12 @@ const props = defineProps<{
 
 const isCardClicked = ref(Array(props.room.words.length).fill(false))
 
-const isUserTeamTurn = computed((): boolean => {
+const isUserTurn = computed((): boolean => {
   return !!props.room.players.find(
-    (player) => player.name === props.user?.name && player.playerTeam === props.room.teamTurn
+    (player) =>
+      player.name === props.user?.name &&
+      player.playerTeam === props.room.teamTurn &&
+      player.playerRole === props.room.roleTurn
   )
 })
 
@@ -31,7 +34,7 @@ const isWordClicked = (word: Word): boolean => {
 const clickWord = async (word: Word): Promise<void> => {
   if (props.room.status !== 'IN_PROGRESS') return
   if (isUserSpy()) return
-  if (!isUserTeamTurn.value) return
+  if (!isUserTurn.value) return
   const roomId = props.room.id
   try {
     await apiFetchData(`room/${roomId}`, 'PUT', {
@@ -47,7 +50,7 @@ const clickWord = async (word: Word): Promise<void> => {
 const selectWord = async (word: Word): Promise<void> => {
   if (props.room.status !== 'IN_PROGRESS') return
   if (isUserSpy()) return
-  if (!isUserTeamTurn.value) return
+  if (!isUserTurn.value) return
   if (isWordClicked(word)) return
   const roomId = props.room.id
   try {
@@ -106,7 +109,7 @@ const getBackground = (color: string): string => {
           @click="selectWord(word)"
         >
           <div
-            class="flex h-full items-end justify-center whitespace-nowrap break-all pb-5 font-fira text-3xl font-bold uppercase"
+            class="mobile:pb-5 mobile:text-3xl flex h-full items-end justify-center whitespace-nowrap break-all pb-1.5 font-fira text-sm font-bold uppercase"
             :class="word.wordColor === 'BLACK' && isUserSpy() ? 'text-white' : 'text-black'"
           >
             {{ word.wordName }}
@@ -126,7 +129,7 @@ const getBackground = (color: string): string => {
               </div>
             </div>
             <button
-              v-if="room.status === 'IN_PROGRESS' && isUserTeamTurn && !isUserSpy()"
+              v-if="room.status === 'IN_PROGRESS' && isUserTurn && !isUserSpy()"
               @click.stop="clickWord(word)"
               class="click-button pointer-events-auto absolute z-10 rounded-full bg-yellow shadow-bottom"
             ></button>
@@ -174,12 +177,27 @@ const getBackground = (color: string): string => {
   transform: translateX(-50%);
 }
 
+@media screen and (max-width: 500px) {
+  .center {
+    top: 105px;
+    width: 100%;
+    padding: 0 10px;
+  }
+}
+
 .card-image {
   width: 208.32px;
   height: 134.4px;
   background-image: url('/images/fronts.png');
   background-size: 100%;
   background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 500px) {
+  .card-image {
+    width: 94.08px;
+    height: 60.48px;
+  }
 }
 
 .card {
@@ -200,12 +218,26 @@ const getBackground = (color: string): string => {
   background-repeat: no-repeat;
 }
 
+@media screen and (max-width: 500px) {
+  .card-background {
+    width: 94.08px;
+    height: 60.48px;
+  }
+}
+
 .black-background {
   width: 208.32px;
   height: 134.4px;
   background-image: url('/images/black-back.png');
   background-size: 100%;
   background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 500px) {
+  .black-background {
+    width: 94.08px;
+    height: 60.48px;
+  }
 }
 
 .card-character.red {
@@ -218,6 +250,13 @@ const getBackground = (color: string): string => {
   background-repeat: no-repeat;
 }
 
+@media screen and (max-width: 500px) {
+  .card-character.red {
+    width: 60.48px;
+    height: 54.24px;
+  }
+}
+
 .card-character.blue {
   z-index: 100;
   width: 134px;
@@ -226,6 +265,13 @@ const getBackground = (color: string): string => {
   background-image: url('/images/blue.png');
   background-size: 100%;
   background-repeat: no-repeat;
+}
+
+@media screen and (max-width: 500px) {
+  .card-character.blue {
+    width: 60.48px;
+    height: 54.24px;
+  }
 }
 
 .card-character.gray {
@@ -238,6 +284,13 @@ const getBackground = (color: string): string => {
   background-repeat: no-repeat;
 }
 
+@media screen and (max-width: 500px) {
+  .card-character.gray {
+    width: 60.48px;
+    height: 54.24px;
+  }
+}
+
 .click-button {
   right: -4.2px;
   top: -2.1px;
@@ -247,10 +300,27 @@ const getBackground = (color: string): string => {
   background-size: 100%;
 }
 
+@media screen and (max-width: 500px) {
+  .click-button {
+    right: -2.1px;
+    top: -1.05px;
+    width: 22.12px;
+    height: 22.12px;
+  }
+}
+
 .tips-wrapper {
   top: 11.2px;
   left: 10.85px;
   width: 184.45px;
+}
+
+@media screen and (max-width: 500px) {
+  .tips-wrapper {
+    top: 5.6px;
+    left: 4.85px;
+    width: 83.2px;
+  }
 }
 
 .tips-wrapper > div {

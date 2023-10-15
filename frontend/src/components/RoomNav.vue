@@ -27,12 +27,12 @@ const togglePlayerMenu = () => {
 </script>
 
 <template>
-  <nav class="m-1 flex justify-between px-2">
+  <nav class="m-1 flex justify-between px-0.5 sm:px-2">
     <div class="flex">
       <div class="relative">
         <button @click="togglePlayersMenu" class="button shadow-bottom">
           <div class="flex items-center justify-center">
-            <span>Joueurs :</span>
+            <span class="hidden sm:block">Joueurs :</span>
             <img src="/images/icon_player.png" alt="Icon player" class="mr-1 h-4 landscape:ml-2" />
             <span>{{ room?.players.length }}</span>
           </div>

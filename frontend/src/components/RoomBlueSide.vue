@@ -47,7 +47,7 @@ const joinRole = async (role: string) => {
 
 <template>
   <div
-    class="landscape:border-ui flex-1 bg-blue-team-bg landscape:flex-none landscape:rounded-xl landscape:shadow-bottom"
+    class="landscape:border-ui flex-1 overflow-y-auto bg-blue-team-bg landscape:flex-none landscape:rounded-xl landscape:shadow-bottom"
   >
     <div class="box-border w-full p-2">
       <section class="relative h-12 landscape:h-28">

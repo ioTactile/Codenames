@@ -206,6 +206,12 @@ const selectTeam = async (team: string) => {
   transform: translateX(-245px) translateY(45px) translateZ(0px);
 }
 
+@media screen and (max-width: 500px) {
+  .menu-wrapper {
+    transform: translateX(-275px) translateY(45px) translateZ(0px);
+  }
+}
+
 .switch {
   position: relative;
   display: inline-block;

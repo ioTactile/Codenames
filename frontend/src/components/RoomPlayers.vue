@@ -136,6 +136,12 @@ const kickPlayer = async (name: string) => {
   transform: translateX(-10px) translateY(45px) translateZ(0px);
 }
 
+@media screen and (max-width: 500px) {
+  .menu-wrapper {
+    transform: translateX(-1px) translateY(45px) translateZ(0px);
+  }
+}
+
 .player-details {
   z-index: 9999;
   position: absolute;

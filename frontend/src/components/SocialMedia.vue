@@ -1,5 +1,17 @@
+<script setup lang="ts">
+defineProps<{
+  size?: string
+}>()
+</script>
+
 <template>
-  <aside class="mx-6 mt-2 flex items-center justify-center gap-3">
+  <aside
+    :class="
+      size === 'landscape'
+        ? 'flex items-center justify-center landscape:mx-6 landscape:mt-2 landscape:gap-3'
+        : 'absolute bottom-1.5 right-1 flex items-center justify-center gap-2 landscape:hidden'
+    "
+  >
     <a
       href="http://www.facebook.com/codenamesgame/"
       target="_blank"
