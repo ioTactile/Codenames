@@ -2,6 +2,7 @@
 import type { Player, Room } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
 import { ref } from 'vue'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   id: number
@@ -10,6 +11,7 @@ const props = defineProps<{
   roomStatus: Room['status']
 }>()
 
+const websocketStore = useWebsocketStore()
 const isPlayerMenuOpen = ref<number | null>(null)
 
 const togglePlayerMenu = (playerIndex: number): void => {
@@ -26,6 +28,7 @@ const shufflePlayers = async (): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'shuffle-players' })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -35,6 +38,7 @@ const resetPlayers = async (): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'reset-players' })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -44,6 +48,7 @@ const changeHost = async (name: string): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'change-host', username: name })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -53,6 +58,7 @@ const kickPlayer = async (name: string): Promise<void> => {
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.id}`, 'PUT', { action: 'leave', username: name })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

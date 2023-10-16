@@ -4,6 +4,7 @@ import type { Player as P, Room } from '@/types/types'
 import Players from '@/components/RoomPlayers.vue'
 import Player from '@/components/RoomPlayer.vue'
 import { apiFetchData } from '@/utils/api'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   room: Room
@@ -16,6 +17,7 @@ const emit = defineEmits<{
   (e: 'openRulesMenu', value: boolean): void
 }>()
 
+const websocketStore = useWebsocketStore()
 const isPlayersMenuOpen = ref<boolean>(false)
 const isPlayerMenuOpen = ref<boolean>(false)
 
@@ -33,6 +35,7 @@ const replay = async (): Promise<void> => {
       action: 'replay',
       usernames: getUsernames()
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

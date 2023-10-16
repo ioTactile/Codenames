@@ -2,12 +2,15 @@
 import type { Player, Room } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
 import { computed } from 'vue'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   room: Room
   user: Player | null
   isHost: boolean
 }>()
+
+const websocketStore = useWebsocketStore()
 
 const isTeamWin = computed((): string => {
   if (props.user?.playerTeam === 'RED' && props.room.status === 'RED_TEAM_WINS') {
@@ -35,6 +38,7 @@ const replay = async (): Promise<void> => {
       action: 'replay',
       usernames: getUsernames()
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

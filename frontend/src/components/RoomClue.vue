@@ -3,6 +3,7 @@ import type { Clue, Player, Room } from '@/types/types'
 import { computed, ref, watch } from 'vue'
 import { apiFetchData } from '@/utils/api'
 import Social from '@/components/SocialMedia.vue'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   room: Room
@@ -10,6 +11,7 @@ const props = defineProps<{
   windowWidth: number
 }>()
 
+const websocketStore = useWebsocketStore()
 const isClueModalOpen = ref<boolean>(false)
 const clueNumber = ref<number>(0)
 const clueName = ref<string>('')
@@ -70,6 +72,7 @@ const sendClue = async (): Promise<void> => {
       },
       username: props.user?.name
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

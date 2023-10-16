@@ -2,11 +2,14 @@
 import type { Room, Player } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
 import { computed } from 'vue'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   room: Room
   user: Player | null
 }>()
+
+const websocketStore = useWebsocketStore()
 
 const blueAgents = computed((): Player[] => {
   if (!props.room) return []
@@ -39,6 +42,7 @@ const joinRole = async (role: string): Promise<void> => {
       role,
       team: 'BLUE'
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

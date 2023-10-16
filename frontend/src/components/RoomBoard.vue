@@ -2,12 +2,14 @@
 import type { Room, Player, Word } from '@/types/types'
 import { computed, ref } from 'vue'
 import { apiFetchData } from '@/utils/api'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   room: Room
   user: Player | null
 }>()
 
+const websocketStore = useWebsocketStore()
 const isCardClicked = ref(Array(props.room.words.length).fill(false))
 
 const isUserTurn = computed((): boolean => {
@@ -42,6 +44,7 @@ const clickWord = async (word: Word): Promise<void> => {
       username: props.user?.name,
       wordname: word.wordName
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -59,6 +62,7 @@ const selectWord = async (word: Word): Promise<void> => {
       username: props.user?.name,
       wordname: word.wordName
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

@@ -16,26 +16,24 @@ import RulesModal from '@/components/RulesModal.vue'
 import Replay from '@/components/RoomReplay.vue'
 import { apiFetchData } from '@/utils/api'
 import { useUserStore } from '@/stores/user'
+import { useWebsocketStore } from '@/stores/websocket'
 // import { useUrlStore } from '@/stores/url'
 // import { storeToRefs } from 'pinia'
-import { CompatClient, Stomp } from '@stomp/stompjs'
-import SockJS from 'sockjs-client/dist/sockjs.min.js'
 import { useWindowSize } from '@vueuse/core'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps<{
   id: number
 }>()
 
 const userStore = useUserStore()
+const websocketStore = useWebsocketStore()
+const { room, isDisconnected } = storeToRefs(websocketStore)
 // const urlStore = useUrlStore()
 // const { urlId, isUrlHidden } = storeToRefs(urlStore)
-const room = ref<Room | null>(null)
 const isTimerMenuOpen = ref<boolean>(false)
 const isRulesMenuOpen = ref<boolean>(false)
 const isLoading = ref<boolean>(true)
-const stompClient = ref<CompatClient | null>(null)
-const isDisconnected = ref<boolean>(false)
-const afkTimer = ref<number | undefined>(undefined)
 const scale = ref<number>(1)
 const { width: windowWidth, height: windowHeight } = useWindowSize()
 
@@ -49,20 +47,8 @@ onMounted(async () => {
   try {
     const data: Room = await apiFetchData(`room/${roomId}`, 'GET')
     room.value = data
-    console.log('data', data)
+    websocketStore.connect(roomId)
     isLoading.value = false
-
-    const socket = new SockJS('http://localhost:8080/ws')
-    stompClient.value = Stomp.over(socket)
-
-    stompClient.value.connect({}, () => {
-      if (!stompClient.value) return
-      stompClient.value.subscribe(`/topic/room/${roomId}`, (response: any) => {
-        const data = JSON.parse(response.body)
-        room.value = data
-      })
-    })
-    handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -75,10 +61,7 @@ onMounted(async () => {
 // })
 
 onUnmounted(() => {
-  clearTimeout(afkTimer.value)
-  if (stompClient.value) {
-    stompClient.value.disconnect()
-  }
+  websocketStore.disconnect()
 })
 
 const user = computed(() => {
@@ -94,34 +77,6 @@ const isHost = computed(() => {
   const host = room.value.players[0].name
   return host === user.value?.name
 })
-
-const disconnnectOnAfk = () => {
-  if (stompClient.value) {
-    stompClient.value.disconnect(() => {
-      isDisconnected.value = true
-    })
-  }
-}
-
-const handleUserActivity = () => {
-  clearTimeout(afkTimer.value)
-  afkTimer.value = setTimeout(disconnnectOnAfk, 600000)
-}
-
-const reconnectToWebsocket = () => {
-  clearTimeout(afkTimer.value)
-  const socket = new SockJS('http://localhost:8080/ws')
-  stompClient.value = Stomp.over(socket)
-
-  stompClient.value.connect({}, () => {
-    if (!stompClient.value) return
-    stompClient.value.subscribe(`/topic/room/${room.value?.id}`, (response: any) => {
-      const data = JSON.parse(response.body)
-      room.value = data
-    })
-  })
-  isDisconnected.value = false
-}
 
 const handleResize = () => {
   const targetHeight = 1080
@@ -234,7 +189,7 @@ watch(
               <p class="text-md mb-4 px-2">
                 Si vous voulez continuer à jouer, vous pouvez vous reconnecter au salon.
               </p>
-              <button class="button shadow-button text-base" @click="reconnectToWebsocket">
+              <button class="button shadow-button text-base" @click="websocketStore.reconnect">
                 Se reconnecter au salon
               </button>
             </div>

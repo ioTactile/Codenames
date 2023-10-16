@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { Room } from '@/types/types'
 import { apiFetchData } from '@/utils/api'
+import { useWebsocketStore } from '@/stores/websocket'
 
 const props = defineProps<{
   room: Room
 }>()
+
+const websocketStore = useWebsocketStore()
 
 const startRoom = async (): Promise<void> => {
   const roomId = props.room.id
@@ -12,6 +15,7 @@ const startRoom = async (): Promise<void> => {
     await apiFetchData(`room/${roomId}`, 'PUT', {
       action: 'start'
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }

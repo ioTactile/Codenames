@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import type { Player, Room } from '@/types/types'
 import { useUserStore } from '@/stores/user'
-import { useUrlStore } from '@/stores/url'
+import { useWebsocketStore } from '@/stores/websocket'
+// import { useUrlStore } from '@/stores/url'
 import { ref } from 'vue'
 import { apiFetchData } from '@/utils/api'
 import { useRouter } from 'vue-router'
-import { storeToRefs } from 'pinia'
+// import { storeToRefs } from 'pinia'
 
 const props = defineProps<{
   id: number
@@ -16,13 +17,14 @@ const props = defineProps<{
 const router = useRouter()
 
 const userStore = useUserStore()
-const urlStore = useUrlStore()
-const { isUrlHidden } = storeToRefs(urlStore)
+const websocketStore = useWebsocketStore()
+// const urlStore = useUrlStore()
+// const { isUrlHidden } = storeToRefs(urlStore)
 const username = ref<string>(props.user?.name || '')
 
-const urlSwitch = (): void => {
-  isUrlHidden.value = !isUrlHidden.value
-}
+// const urlSwitch = (): void => {
+//   isUrlHidden.value = !isUrlHidden.value
+// }
 
 const changeUsername = async (): Promise<void> => {
   if (!username.value) {
@@ -37,6 +39,7 @@ const changeUsername = async (): Promise<void> => {
       newUsername: username.value
     })
     userStore.setUser(props.id, username.value)
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -65,6 +68,7 @@ const selectTeam = async (team: string): Promise<void> => {
       username: props.user?.name,
       team
     })
+    websocketStore.handleUserActivity()
   } catch (error) {
     console.error(error)
   }
@@ -137,7 +141,7 @@ const selectTeam = async (team: string): Promise<void> => {
           <button class="button" @click="changeUsername">Changer de pseudo</button>
         </div>
       </div>
-      <hr class="border-gray-300" />
+      <!-- <hr class="border-gray-300" />
       <div class="bg-gray-200 p-4">
         <div class="flex cursor-pointer items-center justify-start">
           <div class="mr-4 w-14">
@@ -150,7 +154,7 @@ const selectTeam = async (team: string): Promise<void> => {
           </div>
           <p class="flex-1">Cacher l'URL du salon dans la barre d'adresse</p>
         </div>
-      </div>
+      </div> -->
       <hr class="border-gray-300" />
       <div class="flex justify-center rounded-bl-xl rounded-br-xl bg-gray-200 py-4">
         <button class="button text-base shadow-bottom" @click="leaveRoom">
