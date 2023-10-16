@@ -11,8 +11,8 @@ export const useWebsocketStore = defineStore('websocket', () => {
   const afkTimer = ref<ReturnType<typeof setTimeout> | undefined>(undefined)
 
   const socketUrl = import.meta.env.DEV
-    ? import.meta.env.WEBSOCKET_URL_DEV
-    : import.meta.env.WEBSOCKET_URL_PROD
+    ? import.meta.env.VITE_WEBSOCKET_URL_DEV
+    : import.meta.env.VITE_WEBSOCKET_URL_PROD
 
   const connect = (roomId: number) => {
     const socket = new SockJS(socketUrl)

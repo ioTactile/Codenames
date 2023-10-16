@@ -4,8 +4,8 @@ export async function apiFetchData(
   bodyData?: Record<string, any>
 ): Promise<any> {
   const fullUrl = import.meta.env.DEV
-    ? import.meta.env.API_URL_DEV + url
-    : import.meta.env.API_URL_PROD + url
+    ? import.meta.env.VITE_API_URL_DEV + url
+    : import.meta.env.VITE_API_URL_PROD + url
 
   const headers = new Headers({
     'Content-Type': 'application/json'
