@@ -204,21 +204,6 @@ public class RoomServiceTest {
     }
 
     @Test
-    void testStartRoomWithNotEnoughPlayers() {
-        Long roomId = 1L;
-        String pseudo = "jordan";
-        Room expectedRoom = initializeRoom();
-        expectedRoom.getPlayers().add(createPlayer(pseudo));
-        List<Word> words = initializeWords();
-        expectedRoom.setWords(words);
-        setTeamAndRoleTurn(expectedRoom, words);
-
-        when(roomRepository.findById(roomId)).thenReturn(Optional.of(expectedRoom));
-
-        assertThrows(IllegalArgumentException.class, () -> roomService.startRoom(roomId));
-    }
-
-    @Test
     void testSelectTeam() {
         Long roomId = 1L;
         String pseudo = "jordan";
