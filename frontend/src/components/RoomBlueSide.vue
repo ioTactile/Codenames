@@ -43,6 +43,13 @@ const joinRole = async (role: string): Promise<void> => {
     console.error(error)
   }
 }
+
+const getCharacter = (): string => {
+  let number = 0
+  const random = Math.floor(Math.random() * 8) + 1
+  number = (random / 8) * 100
+  return `background-position-y: ${number}%;`
+}
 </script>
 
 <template>
@@ -50,11 +57,17 @@ const joinRole = async (role: string): Promise<void> => {
     class="landscape:border-ui flex-1 overflow-y-auto bg-blue-team-bg landscape:flex-none landscape:rounded-xl landscape:shadow-bottom"
   >
     <div class="box-border w-full p-2">
-      <section class="relative h-12 landscape:h-28">
+      <section class="relative h-12 landscape:h-36">
         <span
           class="score absolute left-[20px] top-6 w-12 text-center text-white landscape:top-14"
           >{{ room.blueRemainingWords || '-' }}</span
         >
+        <div
+          class="card-background absolute right-0 top-0 z-10 portrait:hidden"
+          style="background-position-y: 0%"
+        >
+          <div class="card-character absolute bottom-0 left-1/2" :style="getCharacter()"></div>
+        </div>
       </section>
       <section>
         <span class="relative mt-1 w-full text-base text-blue-light">Agents</span>
@@ -117,5 +130,23 @@ const joinRole = async (role: string): Promise<void> => {
   scale: 1;
   transform: translate3d(0, 0, 0);
   transform-origin: 50% 50% 0px;
+}
+
+.card-background {
+  width: 208.32px;
+  height: 134.4px;
+  background-image: url('/images/backs.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
+}
+
+.card-character {
+  z-index: 100;
+  width: 134px;
+  height: 120px;
+  transform: translateX(-50%);
+  background-image: url('/images/blue.png');
+  background-size: 100%;
+  background-repeat: no-repeat;
 }
 </style>

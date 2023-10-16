@@ -109,7 +109,7 @@ const getBackground = (color: string): string => {
           @click="selectWord(word)"
         >
           <div
-            class="mobile:pb-5 mobile:text-3xl flex h-full items-end justify-center whitespace-nowrap break-all pb-1.5 font-fira text-sm font-bold uppercase"
+            class="flex h-full items-end justify-center whitespace-nowrap break-all pb-1.5 font-fira text-sm font-bold uppercase mobile:pb-5 mobile:text-3xl"
             :class="word.wordColor === 'BLACK' && isUserSpy() ? 'text-white' : 'text-black'"
           >
             {{ word.wordName }}

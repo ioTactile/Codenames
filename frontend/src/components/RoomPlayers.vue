@@ -133,13 +133,7 @@ const kickPlayer = async (name: string): Promise<void> => {
   position: absolute;
   width: 380px;
   inset: 0px auto auto 0px;
-  transform: translateX(-10px) translateY(45px) translateZ(0px);
-}
-
-@media screen and (max-width: 500px) {
-  .menu-wrapper {
-    transform: translateX(-1px) translateY(45px) translateZ(0px);
-  }
+  transform: translateX(-1px) translateY(45px) translateZ(0px);
 }
 
 .player-details {

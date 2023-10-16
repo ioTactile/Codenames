@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { Player, Room } from '@/types/types'
 import { useUserStore } from '@/stores/user'
-import { onMounted, ref, watch } from 'vue'
+import { useUrlStore } from '@/stores/url'
+import { ref } from 'vue'
 import { apiFetchData } from '@/utils/api'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
 
 const props = defineProps<{
   id: number
@@ -14,30 +16,13 @@ const props = defineProps<{
 const router = useRouter()
 
 const userStore = useUserStore()
+const urlStore = useUrlStore()
+const { isUrlHidden } = storeToRefs(urlStore)
 const username = ref<string>(props.user?.name || '')
-const isURLHidden = ref<boolean>(false)
 
-onMounted(() => {
-  if (localStorage.getItem('url-hidden')) {
-    isURLHidden.value = true
-  }
-})
-
-watch(isURLHidden, (value) => {
-  if (value) {
-    const urlArrayJSON = JSON.stringify([
-      {
-        urlHidden: 'hidden-1',
-        urlShown: props.id
-      }
-    ])
-    localStorage.setItem('url-hidden', urlArrayJSON)
-    history.pushState({}, '', '/room/hidden-1')
-  } else {
-    localStorage.removeItem('url-hidden')
-    history.pushState({}, '', `/room/${props.id}`)
-  }
-})
+const urlSwitch = (): void => {
+  isUrlHidden.value = !isUrlHidden.value
+}
 
 const changeUsername = async (): Promise<void> => {
   if (!username.value) {
@@ -158,7 +143,7 @@ const selectTeam = async (team: string): Promise<void> => {
           <div class="mr-4 w-14">
             <div class="relative w-full">
               <label class="switch">
-                <input v-model="isURLHidden" type="checkbox" />
+                <input v-model="isUrlHidden" type="checkbox" @click="urlSwitch" />
                 <span class="slider round"></span>
               </label>
             </div>
@@ -203,13 +188,7 @@ const selectTeam = async (team: string): Promise<void> => {
   position: absolute;
   width: 360px;
   inset: 0px auto auto 0px;
-  transform: translateX(-245px) translateY(45px) translateZ(0px);
-}
-
-@media screen and (max-width: 500px) {
-  .menu-wrapper {
-    transform: translateX(-275px) translateY(45px) translateZ(0px);
-  }
+  transform: translateX(-275px) translateY(45px) translateZ(0px);
 }
 
 .switch {

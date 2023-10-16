@@ -47,9 +47,8 @@ public class RoomService {
 
     public void replay(Long roomId, List<String> pseudos) {
         Room room = getRoomById(roomId);
-        if (room == null || !room.getStatus().equals(RoomStatus.RED_TEAM_WINS) &&
-                !room.getStatus().equals(RoomStatus.BLUE_TEAM_WINS)) {
-            throw new IllegalArgumentException("Room not found or not finished");
+        if (room == null) {
+            throw new IllegalArgumentException("Room not found");
         }
         room.setPlayers(new ArrayList<>());
         for (String pseudo : pseudos) {

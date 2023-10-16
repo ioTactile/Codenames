@@ -12,9 +12,12 @@ import BlueSide from '@/components/RoomBlueSide.vue'
 import History from '@/components/RoomHistory.vue'
 import SocialMedia from '@/components/SocialMedia.vue'
 import TimerModal from '@/components/RoomTimerModal.vue'
+import RulesModal from '@/components/RulesModal.vue'
 import Replay from '@/components/RoomReplay.vue'
 import { apiFetchData } from '@/utils/api'
 import { useUserStore } from '@/stores/user'
+// import { useUrlStore } from '@/stores/url'
+// import { storeToRefs } from 'pinia'
 import { CompatClient, Stomp } from '@stomp/stompjs'
 import SockJS from 'sockjs-client/dist/sockjs.min.js'
 import { useWindowSize } from '@vueuse/core'
@@ -24,8 +27,11 @@ const props = defineProps<{
 }>()
 
 const userStore = useUserStore()
+// const urlStore = useUrlStore()
+// const { urlId, isUrlHidden } = storeToRefs(urlStore)
 const room = ref<Room | null>(null)
 const isTimerMenuOpen = ref<boolean>(false)
+const isRulesMenuOpen = ref<boolean>(false)
 const isLoading = ref<boolean>(true)
 const stompClient = ref<CompatClient | null>(null)
 const isDisconnected = ref<boolean>(false)
@@ -36,6 +42,9 @@ const { width: windowWidth, height: windowHeight } = useWindowSize()
 onMounted(async () => {
   const roomId = props.id
   if (!roomId) return
+
+  // urlStore.setUrl(roomId.toString())
+  // history.pushState({}, '', `/room/${urlStore.getUrl()}`)
 
   try {
     const data: Room = await apiFetchData(`room/${roomId}`, 'GET')
@@ -58,6 +67,12 @@ onMounted(async () => {
     console.error(error)
   }
 })
+
+// onBeforeUnmount(() => {
+//   window.addEventListener('beforeunload', () => {
+//     history.pushState({}, '', `/room/${props.id}`)
+//   })
+// })
 
 onUnmounted(() => {
   clearTimeout(afkTimer.value)
@@ -125,6 +140,13 @@ watch(
   },
   { immediate: true }
 )
+
+// watch(isUrlHidden, (value) => {
+//   if (value === false) {
+//     urlId.value = props.id.toString()
+//   }
+//   history.pushState({}, '', `/room/${urlStore.getUrl()}`)
+// })
 </script>
 
 <template>
@@ -151,6 +173,7 @@ watch(
                     :is-host="isHost"
                     :user="user"
                     @open-timer-menu="isTimerMenuOpen = $event"
+                    @open-rules-menu="isRulesMenuOpen = $event"
                   />
                   <Instructions :room="room" :is-host="isHost" :user="user" />
                   <Clue
@@ -220,6 +243,10 @@ watch(
         <TimerModal
           :isTimerMenuOpen="isTimerMenuOpen"
           @close-timer-menu="isTimerMenuOpen = $event"
+        />
+        <RulesModal
+          :isRulesMenuOpen="isRulesMenuOpen"
+          @close-rules-menu="isRulesMenuOpen = $event"
         />
       </div>
     </div>

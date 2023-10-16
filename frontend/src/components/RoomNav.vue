@@ -3,8 +3,9 @@ import { ref } from 'vue'
 import type { Player as P, Room } from '@/types/types'
 import Players from '@/components/RoomPlayers.vue'
 import Player from '@/components/RoomPlayer.vue'
+import { apiFetchData } from '@/utils/api'
 
-defineProps<{
+const props = defineProps<{
   room: Room
   isHost: boolean
   user: P | null
@@ -12,6 +13,7 @@ defineProps<{
 
 const emit = defineEmits<{
   (e: 'openTimerMenu', value: boolean): void
+  (e: 'openRulesMenu', value: boolean): void
 }>()
 
 const isPlayersMenuOpen = ref<boolean>(false)
@@ -23,6 +25,22 @@ const togglePlayersMenu = (): void => {
 
 const togglePlayerMenu = (): void => {
   isPlayerMenuOpen.value = !isPlayerMenuOpen.value
+}
+const replay = async (): Promise<void> => {
+  if (!props.isHost) return
+  try {
+    await apiFetchData(`room/${props.room.id}`, 'PUT', {
+      action: 'replay',
+      usernames: getUsernames()
+    })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+const getUsernames = (): String[] => {
+  const usernames = props.room.players.map((player) => player.name)
+  return usernames
 }
 </script>
 
@@ -54,7 +72,14 @@ const togglePlayerMenu = (): void => {
       </button>
     </div>
     <div class="flex">
-      <button class="button mx-2 shadow-bottom">Règles</button>
+      <button
+        v-if="isHost && room.status === 'IN_PROGRESS'"
+        class="button text-base shadow-bottom"
+        @click="replay"
+      >
+        Réinitialiser
+      </button>
+      <button class="button mx-2 shadow-bottom" @click="emit('openRulesMenu', true)">Règles</button>
       <div class="relative">
         <button
           class="button shadow-bottom"

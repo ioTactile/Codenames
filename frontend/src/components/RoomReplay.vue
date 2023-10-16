@@ -29,7 +29,6 @@ const details = computed((): string => {
 })
 
 const replay = async (): Promise<void> => {
-  if (props.room.status === 'IN_PROGRESS') return
   if (!props.isHost) return
   try {
     await apiFetchData(`room/${props.room.id}`, 'PUT', {
