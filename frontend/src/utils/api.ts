@@ -3,7 +3,10 @@ export async function apiFetchData(
   method: string,
   bodyData?: Record<string, any>
 ): Promise<any> {
-  const fullUrl = `http://localhost:8080/${url}`
+  const fullUrl = import.meta.env.DEV
+    ? import.meta.env.API_URL_DEV + url
+    : import.meta.env.API_URL_PROD + url
+
   const headers = new Headers({
     'Content-Type': 'application/json'
   })
