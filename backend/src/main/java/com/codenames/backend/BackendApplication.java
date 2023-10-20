@@ -1,6 +1,5 @@
 package com.codenames.backend;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -10,24 +9,21 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @SpringBootApplication
 public class BackendApplication {
 
-	@Value("${FRONTEND_URL}")
-	private String frontendUrl;
-
-	public static void main(String[] args) {
-
-		SpringApplication.run(BackendApplication.class, args);
-	}
-
 	@Bean
 	public WebMvcConfigurer corsConfiguer() {
 		return new WebMvcConfigurer() {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/room/**")
-						.allowedOrigins(frontendUrl)
+						.allowedOrigins("http://localhost:5173", "http://localhost:5003")
 						.allowedMethods("GET", "POST", "PUT", "DELETE")
 						.allowedHeaders("*");
 			}
 		};
+	}
+
+	public static void main(String[] args) {
+
+		SpringApplication.run(BackendApplication.class, args);
 	}
 }

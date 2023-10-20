@@ -9,7 +9,6 @@ export const useUserStore = defineStore(
 
     const setUser = (roomId: number, username: string) => {
       const userIndex = user.value.findIndex((u) => u.roomId === roomId)
-      console.log(userIndex)
       if (userIndex !== -1) {
         user.value[userIndex].username = username
       } else {

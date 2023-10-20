@@ -1,5 +1,6 @@
 package com.codenames.backend.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -39,8 +40,9 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    public Room get(@PathVariable("id") Long id) {
-        return roomService.getRoomById(id);
+    public ResponseEntity<Room> get(@PathVariable("id") Long id) {
+        Room room = roomService.getRoomById(id);
+        return ResponseEntity.ok(room);
     }
 
     @DeleteMapping("/{id}")
@@ -103,7 +105,15 @@ public class RoomController {
                 roomService.addClue(id, clue, username);
                 break;
             case "replay":
-                List<String> usernames = (List<String>) requestPayload.get("usernames");
+                List<String> usernames = new ArrayList<String>();
+                Object usernamesObj = requestPayload.get("usernames");
+                if (usernamesObj instanceof List<?>) {
+                    for (Object usernameObj : (List<?>) usernamesObj) {
+                        if (usernameObj instanceof String) {
+                            usernames.add((String) usernameObj);
+                        }
+                    }
+                }
                 roomService.replay(id, usernames);
                 break;
             default:

@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.codenames.backend.model.Clue;
@@ -30,7 +29,6 @@ public class RoomService {
 
     private final RoomRepository roomRepository;
 
-    @Autowired
     public RoomService(RoomRepository roomRepository) {
         this.roomRepository = roomRepository;
     }
