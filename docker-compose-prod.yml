@@ -1,11 +1,11 @@
-version: "3.8"
+version: '3.8'
 services:
   postgres:
     image: postgres
     container_name: postgres
     restart: always
     ports:
-      - 5432:5000
+      - "5432:5000"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
@@ -17,41 +17,40 @@ services:
     container_name: pgadmin4_container
     restart: always
     ports:
-      - 8888:5001
+      - "8888:5001"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     volumes:
       - ./pgadmin-data:/var/lib/pgadmin
   backend:
-    container_name: backend
-    build: ./backend
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile.prod
     ports:
-      - 8080:5002
-    depends_on:
-      - postgres
-    volumes:
-      - ./backend:/app
+      - "8080:5002"
+    env_file:
+      - ./backend/.env.production
   frontend:
-    container_name: frontend
-    build: ./frontend
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
     ports:
-      - 3000:5003
+      - "5173:5003"
+    env_file:
+      - ./frontend/.env.production
     depends_on:
       - backend
-    volumes:
-      - ./frontend:/app
-  nginx:
-    container_name: nginx
-    image: nginx:alpine
-    build: ./.nginx
-    depends_on:
-      - backend
-      - frontend
-    ports:
-      - 80:80
-      - 443:443
-
+    nginx:
+      build: ./.nginx
+      ports:
+        - "80:80"
+        - "443:443"
+      depends_on:
+        - backend
+        - frontend
+        
 volumes:
   postgres-data:
   pgadmin-data:
+
