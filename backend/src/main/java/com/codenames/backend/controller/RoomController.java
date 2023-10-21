@@ -21,7 +21,7 @@ import com.codenames.backend.service.RoomService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
-@RequestMapping("/room")
+@RequestMapping("/api/room")
 public class RoomController {
 
     private final RoomService roomService;

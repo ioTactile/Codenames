@@ -15,7 +15,7 @@ public class BackendApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/room/**")
-						.allowedOrigins("http://localhost:3000", "http://frontend:5003")
+						.allowedOrigins("http://localhost:3000", "http://localhost")
 						.allowedMethods("GET", "POST", "PUT", "DELETE")
 						.allowedHeaders("*");
 			}

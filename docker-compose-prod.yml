@@ -5,52 +5,64 @@ services:
     container_name: postgres
     restart: always
     ports:
-      - "5432:5000"
+      - "5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres-prod-data:/var/lib/postgresql/data
+
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4_container
     restart: always
     ports:
-      - "8888:5001"
+      - "8888:80"
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     volumes:
-      - pgadmin-data:/var/lib/pgadmin
+      - pgadmin-prod-data:/var/lib/pgadmin
+    depends_on:
+      - postgres
+
   backend:
+    container_name: backend
     build: 
       context: ./backend
       dockerfile: Dockerfile.prod
     ports:
-      - "8080:5002"
+      - "8080:8080"
     env_file:
       - ./backend/.env.production
+    depends_on:
+      - postgres
+
   frontend:
+    container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile.prod
     ports:
-      - "5173:5003"
+      - "3000:3000"
     env_file:
       - ./frontend/.env.production
     depends_on:
       - backend
-    nginx:
-      build: ./.nginx
-      ports:
-        - "80:80"
-        - "443:443"
-      depends_on:
-        - backend
-        - frontend
-        
+
+  nginx:
+    image: proxy
+    container_name: nginx
+    build: ./.nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+
 volumes:
-  postgres-data:
-  pgadmin-data:
+  postgres-prod-data:
+  pgadmin-prod-data:
 

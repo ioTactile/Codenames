@@ -5,4 +5,5 @@ Dockerfile.*
 .env.*.example
 HELP.md
 
-target/
+# Active target directory for production build
+# target/

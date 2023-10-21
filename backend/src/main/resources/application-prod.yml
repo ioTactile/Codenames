@@ -1,7 +1,7 @@
-server:
-  port: 8080
-  servlet:
-    context-path: /api/0.0.1
+# server:
+#   port: 8080
+#   servlet:
+#     context-path: /api/0.0.1
 
 spring:
   datasource:

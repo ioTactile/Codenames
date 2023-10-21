@@ -1,4 +1,4 @@
 FROM openjdk:20
 WORKDIR /app/backend
 COPY target/app.jar app.jar
-CMD ["java", "-jar", "/app.jar", "-Dspring.profiles.active=prod"]
+CMD ["java", "-jar", "app.jar", "-Dspring.profiles.active=prod"]
