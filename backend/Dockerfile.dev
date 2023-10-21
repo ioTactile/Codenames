@@ -1,4 +1,8 @@
 FROM openjdk:20
 WORKDIR /app/backend
-COPY target/app.jar app.jar
-CMD ["java", "-jar", "/app.jar", "-Dspring.profiles.active=dev"]
+COPY .mvn/ .mvn
+COPY mvnw pom.xml ./
+RUN ./mvnw dependency:go-offline
+COPY src ./src
+EXPOSE 8080
+CMD ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=dev"]

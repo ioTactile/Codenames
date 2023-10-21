@@ -14,7 +14,11 @@ spring:
       ddl-auto: update
     show_sql: false
     database: postgresql
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    properties:
+      hibernate:
+        show-sql: false
+        format-sql: false
+        dialect: org.hibernate.dialect.PostgreSQLDialect
     open-in-view: false
     generate-ddl: false
   devtools:
