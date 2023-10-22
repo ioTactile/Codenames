@@ -1,13 +1,10 @@
-FROM node as build
-# RUN npm install -g http-server
+FROM node AS build
 WORKDIR /app/frontend
 COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
-# CMD ["http-server", "dist", "-p", "3000"]
 
 FROM nginx
-WORKDIR /usr/share/nginx/html
-COPY --from=build /app/frontend/dist .
-ENTRYPOINT ["nginx", "-g", "daemon off;"]
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
+CMD ["nginx", "-g", "daemon off;"]

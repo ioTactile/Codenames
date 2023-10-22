@@ -27,6 +27,19 @@ services:
     depends_on:
       - postgres
 
+  nginx:
+    container_name: nginx
+    restart: always
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - backend
+      - frontend
+
   backend:
     container_name: backend
     build: 
@@ -50,17 +63,6 @@ services:
       - ./frontend/.env.production
     depends_on:
       - backend
-
-  nginx:
-    image: proxy
-    container_name: nginx
-    build: ./.nginx
-    ports:
-      - "80:80"
-      - "443:443"
-    depends_on:
-      - backend
-      - frontend
 
 volumes:
   postgres-prod-data:

@@ -15,7 +15,7 @@ services:
 
   pgadmin:
     image: dpage/pgadmin4
-    container_name: pgadmin4_container
+    container_name: pgadmin
     restart: always
     ports:
       - "8888:80"
@@ -26,6 +26,18 @@ services:
       - pgadmin-data:/var/lib/pgadmin
     depends_on:
       - postgres
+
+  # nginx:
+  #   container_name: nginx
+  #   restart: always
+  #   build:
+  #     context: ./.nginx
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "3050:80"
+  #   depends_on:
+  #     - backend
+  #     - frontend
 
   backend:
     container_name: backend
@@ -47,7 +59,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.dev
     ports:
-      - "3000:3000"
+      - "5173:5173"
     volumes:
       - ./frontend/src:/app/frontend/src:ro
     env_file:
