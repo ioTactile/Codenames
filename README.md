@@ -1,6 +1,6 @@
 # Codenames
 
-This is a web application for the game Codenames. It is built with Java Spring Boot and Vue.js. The application is running in a docker container.
+This project is a replica of the Codenames game web application, primarily designed to facilitate my learning of Java, with a particular emphasis on backend development. The frontend is constructed using Vue.js with Vue Router and Pinia. The entire application is composed of Java Spring Boot for the backend and Vue.js for the frontend, and it operates within a Docker container.
 
 ## Todo list / Roadmap (I'm giving myself 2 months to deliver a basic version)
 
